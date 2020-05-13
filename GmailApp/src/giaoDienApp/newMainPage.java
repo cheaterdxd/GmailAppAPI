@@ -874,11 +874,17 @@ public class newMainPage extends javax.swing.JFrame {
     private void send_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_send_LbMouseClicked
 	// TODO add your handling code here:
 	// kiểm tra địa chỉ mail cần gửi đến có nhập không
+	boolean checkMail = true;
 	if (this.to_Tf.getText().equals("")) {
 	    JOptionPane.showMessageDialog(this, "Bạn chưa nhập mail người cần nhận ! Xin vui lòng nhập đầy đủ !");
 	} else {
+	    String mailto = to_Tf.getText().trim();
+	    String[] listmailto = mailto.split(";");
+	    for(String mail: listmailto){
+		checkMail = checkMail(mail);
+	    }
 	    // nếu có thì kiểm tra format có đúng không
-	    if (checkMail(this.to_Tf.getText()) == true) {
+	    if (checkMail) {
 		// gọi hàm để lấy thông tin và gửi mail
 		clickSentMail();
 		// clean các trường để nhập mail
