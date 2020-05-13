@@ -340,7 +340,7 @@ public class newMainPage extends javax.swing.JFrame {
                 logout_LbMouseClicked(evt);
             }
         });
-        menu_Pn.add(logout_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 610, 70, 60));
+        menu_Pn.add(logout_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 670, 70, 60));
 
         daGui_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         daGui_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/send_email_50px.png"))); // NOI18N
@@ -671,25 +671,28 @@ public class newMainPage extends javax.swing.JFrame {
 	// TODO add your handling code here:
 	// vì ban đầu là load cái box này lên trước,model đã có sẵn , nên khi bấm vào thì chỉ cần set lại model lên
 	// mà không load lại từ đầu
-	// kiểm tra nếu không đang load INBOX thì gắn lại tên 
-	if (!loadingBoxName_Lb.getText().equals("INBOX")) {
-	    loadingBoxName_Lb.setText("INBOX");
-	    try {
-		int count = LabelProcess.countAllMailLabel(this.loadingBoxName_Lb.getText());
-		// nếu số lượng mail đã load trước đó < số lượng mail vừa lấy từ Server về thì cần load lại hoặc là load chưa hết
-		if (boxMail_Jlist.getModel().getSize() < count) {
-		    // gọi hàm reload
-		    reloadBoxMail(countInboxLabel);
-		} else {
-		    boxMail_Jlist.setModel(inboxMailMode);                      // đổ dữ liệu từ listmodel đã tạo ở trên vào cái hiển thị
-		    boxMail_Jlist.setCellRenderer(new mailListRender("INBOX"));   // set các cell trong list lại .
-		    this.countMailLoading_Lb.setText(String.valueOf(countInboxLabel));
-		}
-
-	    } catch (IOException ex) {
-		Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
-	    }
+	if (loadingBoxName_Lb.getText().equals("INBOX")) {
+	    return;
 	}
+
+	loadingBoxName_Lb.setText("INBOX");
+	try {
+	    // lấy số lượng mail của INBOX hiện tại
+	    int count = LabelProcess.countAllMailLabel(this.loadingBoxName_Lb.getText());
+	    // nếu số lượng mail đã load trước đó < số lượng mail vừa lấy từ Server về thì cần load lại hoặc là load chưa hết
+	    if (boxMail_Jlist.getModel().getSize() < count) {
+		// gọi hàm reload
+		reloadBoxMail(countInboxLabel);
+	    } else {
+		boxMail_Jlist.setModel(inboxMailMode);                      // đổ dữ liệu từ listmodel đã tạo ở trên vào cái hiển thị
+		boxMail_Jlist.setCellRenderer(new mailListRender("INBOX"));   // render các cell trong list lại .
+		this.countMailLoading_Lb.setText(String.valueOf(boxMail_Jlist.getModel().getSize()));
+	    }
+
+	} catch (IOException ex) {
+	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	}
+
 	cleanReadMailPanel();
 	this.boxMail_Jlist.setVisible(true);
 	this.writeMail_Pn.setVisible(false);
@@ -701,36 +704,40 @@ public class newMainPage extends javax.swing.JFrame {
 	System.exit(0);
     }//GEN-LAST:event_exit_LbMouseClicked
     private void untrash() {
-	int selectedIndex = this.boxMail_Jlist.getSelectedIndex();
-	if (selectedIndex != -1) {
+//	int selectedIndex = this.boxMail_Jlist.getSelectedIndex();
+	if (chooseMessage != -1) {
 	    int response = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn Untrash thư này hay không?");
 	    if (response == JOptionPane.YES_OPTION) {
-		MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(selectedIndex);
+		MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
 		try {
 		    MessageProcess.unTrash(msgOb.id);
 		    // lấy model hiện tại của box
 		    DefaultListModel listMail = (DefaultListModel) boxMail_Jlist.getModel();
 		    //remove ở index cần untrash
-		    listMail.remove(selectedIndex);
+		    listMail.remove(chooseMessage);
 		    //set lại model cho box
 		    boxMail_Jlist.setModel(listMail);
 		    JOptionPane.showMessageDialog(this, "Đã untrash thành công !");
+		    // xoá đi readPanel mail đang hiện( là mail đang bị untrash)
+		    cleanReadMailPanel();
 		} catch (IOException ex) {
 		    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	    }
+	    chooseMessage = -1;
 	}
     }
+
+    public int chooseMessage = -1;
     private void boxMail_JlistMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_boxMail_JlistMouseClicked
 	// TODO add your handling code here: bấm vào để đọc mail
 
 	// xử lý riêng cho khi load trash inbox: dùng right click để untrash
 	// kiểm tra có phải right click không
+	chooseMessage = boxMail_Jlist.getSelectedIndex();
 	if (evt.getButton() == MouseEvent.BUTTON3 && loadingBoxName_Lb.getText().equals("TRASH")) {
 	    // untrash 
 	    untrash();
-	    // xoá đi readPanel mail đang hiện( là mail đang bị untrash)
-	    cleanReadMailPanel();
 	} else {
 	    if (loadingBoxName_Lb.getText().equals("DRAFT")) {
 		newMailPrepare();
@@ -738,7 +745,7 @@ public class newMainPage extends javax.swing.JFrame {
 		send_Lb.setText("Send draft");
 		// xử lý send draft tiếp theo sẽ được xử lý ở event của nút send
 	    } else {
-		int chooseMessage = boxMail_Jlist.getSelectedIndex();
+		System.out.println("chooseIndex:" + chooseMessage);
 		if (chooseMessage != -1) {
 		    mail_Pn.setVisible(true);
 		    MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
@@ -960,20 +967,21 @@ public class newMainPage extends javax.swing.JFrame {
 	    return;
 	}
 	// lấy index phần tử cần move to trash
-	int chooseIndex = boxMail_Jlist.getSelectedIndex();
+//	int chooseIndex = boxMail_Jlist.getSelectedIndex();
+	System.out.println("chooseIndex trash " + chooseMessage);
 	// nếu chưa chọn thì index =-1, không làm gì cả, nếu khác thì mới chạy code
-	if (chooseIndex != -1) {
+	if (chooseMessage != -1) {
 	    int confirmResponse = JOptionPane.showConfirmDialog(this, "Bạn có chăc muốn đưa mail này vào thùng rác không?");
 	    if (confirmResponse == JOptionPane.YES_OPTION) {
 
-		MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseIndex);
+		MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
 		try {
 		    // gửi tham số cho hàm là MessageId
 		    MessageProcess.moveToTrash(msgOb.id);
 		    //lấy listModel từ box đang load
 		    DefaultListModel listMail = (DefaultListModel) boxMail_Jlist.getModel();
 		    // xoá message đang chọn ra khỏi list
-		    listMail.remove(chooseIndex);
+		    listMail.remove(chooseMessage);
 		    // set lại lên Jlist
 		    boxMail_Jlist.setModel(listMail);
 		    //clean readMailPanel
@@ -983,6 +991,7 @@ public class newMainPage extends javax.swing.JFrame {
 		}
 	    }
 	}
+	chooseMessage = -1;
     }//GEN-LAST:event_moveToTrash_LbMouseClicked
 
     /**
@@ -1042,7 +1051,6 @@ public class newMainPage extends javax.swing.JFrame {
 	cleanReadMailPanel();
 	DefaultListModel model = (DefaultListModel) boxMail_Jlist.getModel();
 	model.removeAllElements();
-	boxMail_Jlist.setModel(model);
 	// load lại jlist dựa vào label đang load
 	startThread(this.loadingBoxName_Lb.getText());
     }
@@ -1061,104 +1069,69 @@ public class newMainPage extends javax.swing.JFrame {
 
     }//GEN-LAST:event_reload_BtActionPerformed
 
-    private void loadTrashMailBox() {
-	// load lại Jlist hiển thị mail
-	startThread("TRASH");
-    }
     private void trashMail_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_trashMail_LbMouseClicked
-	int count;
-	//clean 
-	cleanReadMailPanel();
-	loadingBoxName_Lb.setText("TRASH"); //set label hiển thị tên label đang load
-	// hiển thị số lượng mail đang có trong box
-	try {
-	    this.countMailLoading_Lb.setText(String.valueOf(count = LabelProcess.countAllMailLabel(this.loadingBoxName_Lb.getText())));
-	    // nếu là lần đầu bấm vào, listMode chưa được set thì khởi tạo
-	    if (trashMailMode == null) {
-		// khởi tạo new model
-		trashMailMode = new DefaultListModel();
-		//gán model cho Jlist
-		boxMail_Jlist.setModel(trashMailMode);
-		// load label TRASH và gán vào Jlist
-		loadTrashMailBox();
-	    } else {
-		//nếu là lần thứ 2 trở đi bấm vào thì kiểm tra xem có load đủ object lên chưa
-		// nếu chưa thì load lại lên
-		if (count > boxMail_Jlist.getModel().getSize()) {
-		    loadTrashMailBox();
-		} else {
-		    // nếu đủ thì chỉ cần load lại model lên
-		    boxMail_Jlist.setModel(trashMailMode);
-
-		}
-	    }
-	    boxMail_Jlist.setCellRenderer(new mailListRender("TRASH"));
-	} catch (IOException ex) {
-	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	if (loadingBoxName_Lb.getText().equals("TRASH")) {
+	    return;
 	}
-
-	this.boxMail_Jlist.setVisible(true);
-	this.writeMail_Pn.setVisible(false);
-	this.readMail_Pn.setVisible(true);
+	loadHopThu("TRASH");
     }//GEN-LAST:event_trashMail_LbMouseClicked
 
     private void reply_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reply_LbMouseClicked
 	// lấy index mail đang chọn
-	int chooseIndex = boxMail_Jlist.getSelectedIndex();
-	if (chooseIndex != -1) {
+//	int chooseIndex = boxMail_Jlist.getSelectedIndex();
+	if (chooseMessage != -1) {
 	    // lấy message object tương ứng với index đã chọn
-	    MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseIndex);
+	    MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
 	    // hiện 1 frame cho thao tác reply
 	    ReplyMailFrame a = new ReplyMailFrame(this, msgOb);
 	    // set frame được nhìn thấy
 	    a.setVisible(true);
 	}
+	chooseMessage = -1;
     }//GEN-LAST:event_reply_LbMouseClicked
 
-    private void loadDaGuiMailBox() {
-	// bắt đầu thread load mail lên
-	startThread("SENT");
-//	loadMsgObToJlist("SENT");
-	boxMail_Jlist.setVisible(true);
-
-    }
-    private void daGui_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_daGui_LbMouseClicked
-	if (loadingBoxName_Lb.getText().equals("SENT")) {
-	    return;
-	}
-	// test
-//	if (sw1.isCancelled() == false) {
-//	    sw1.cancel(true);
-//	}
-//	System.out.println("==================================================");
-	// xoá read panel
+    public void loadHopThu(String label) {
+	//xoa panel
 	cleanReadMailPanel();
-	// set tên cho label đang load
-	loadingBoxName_Lb.setText("SENT");
-	//set số lượng cho label đang load
+	//đặt tên cho label hiện tên 
+	loadingBoxName_Lb.setText(label);
+	try {
+	    //set số lượng cho label hiện số lượng
+	    this.countMailLoading_Lb.setText(String.valueOf(LabelProcess.countAllMailLabel(this.loadingBoxName_Lb.getText())));
+	} catch (IOException ex) {
+	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	}
 
 	// nếu là lần đầu bấm vào, listMode chưa được set thì khởi tạo
-	if (sentMailMode == null) {
+	DefaultListModel workingModel = null;
+	if (label.equals("SENT")) {
+	    workingModel = sentMailMode;
+	}
+	if (label.equals("INBOX")) {
+	    workingModel = inboxMailMode;
+	}
+	if (label.equals("TRASH")) {
+	    workingModel = trashMailMode;
+	}
+	if (workingModel == null) {
 	    // khởi tạo new model
 	    DefaultListModel mode = new DefaultListModel();
 	    //gán model cho Jlist
 	    boxMail_Jlist.setModel(mode);
-	    boxMail_Jlist.setCellRenderer(new mailListRender("SENT"));
-	    // load label TRASH và gán vào Jlist
-//	    loadMsgObToJlist("SENT");
-	    loadDaGuiMailBox();
-	    sentMailMode = (DefaultListModel) boxMail_Jlist.getModel();
+	    boxMail_Jlist.setCellRenderer(new mailListRender(label));
+	    startThread(label);
+	    workingModel = (DefaultListModel) boxMail_Jlist.getModel();
 	} else {
 	    int count = 0;
 	    try {
 		this.countMailLoading_Lb.setText(String.valueOf(count = LabelProcess.countAllMailLabel(this.loadingBoxName_Lb.getText())));
 		//nếu số lượng mail hiện có lớn hơn số mail đã load được, thì reload
 		if (count > boxMail_Jlist.getModel().getSize()) {
-		    loadDaGuiMailBox();
+		    startThread(label);
 		} else {
 		    //nếu là lần thứ 2 trở đi bấm vào thì chỉ set lại model lên mà ko load lại dữ liệu
-		    boxMail_Jlist.setModel(sentMailMode);
-		    boxMail_Jlist.setCellRenderer(new mailListRender("SENT"));
+		    boxMail_Jlist.setModel(workingModel);
+		    boxMail_Jlist.setCellRenderer(new mailListRender(label));
 		}
 
 	    } catch (IOException ex) {
@@ -1168,18 +1141,20 @@ public class newMainPage extends javax.swing.JFrame {
 	this.boxMail_Jlist.setVisible(true);
 	this.writeMail_Pn.setVisible(false);
 	this.readMail_Pn.setVisible(true);
-    }//GEN-LAST:event_daGui_LbMouseClicked
-    
-    public void loadDraftMailBox(){
-	startThread("DRAFT");
     }
-    
+    private void daGui_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_daGui_LbMouseClicked
+	if (loadingBoxName_Lb.getText().equals("SENT")) {
+	    return;
+	}
+	loadHopThu("SENT");
+    }//GEN-LAST:event_daGui_LbMouseClicked
+
     private void draft_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_draft_LbMouseClicked
 	// TODO add your handling code here:
 	if (loadingBoxName_Lb.getText().equals("DRAFT")) {
 	    return;
 	}
-	
+
 	// xoá read panel
 	cleanReadMailPanel();
 	// set tên cho label đang load
@@ -1196,7 +1171,7 @@ public class newMainPage extends javax.swing.JFrame {
 	boxMail_Jlist.setModel(mode);
 	boxMail_Jlist.setCellRenderer(new mailListRender("DRAFT"));
 	// load label DRAFT và gán vào Jlist
-	loadDraftMailBox();
+	startThread("DRAFT");
     }//GEN-LAST:event_draft_LbMouseClicked
 
     private void boxMail_JlistValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_boxMail_JlistValueChanged
@@ -1354,7 +1329,7 @@ public class newMainPage extends javax.swing.JFrame {
 			messages.addAll(response.getMessages());
 			for (Message msg : messages) {
 			    MessageObject newMessOb = MessageProcess.getQuickHeaderInfo(msg.getId());
-			    System.out.println(newMessOb.id + " " + newMessOb.from + " " + newMessOb.date);
+//			    System.out.println(newMessOb.id + " " + newMessOb.from + " " + newMessOb.date);
 			    publish(newMessOb);
 			    Thread.sleep(100);
 			}
