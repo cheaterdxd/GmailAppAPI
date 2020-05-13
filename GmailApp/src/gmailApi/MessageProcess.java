@@ -370,20 +370,6 @@ public class MessageProcess {
      */
     public static Message getMessageById(Gmail service, String userId, String messageId) throws IOException, MessagingException {
 	Message message = service.users().messages().get(userId, messageId).setFormat("full").execute();
-//	MessagePart payload = message.getPayload();
-//	List<MessagePartHeader> headers = payload.getHeaders();
-//	for (MessagePartHeader messHeadPart : headers) {
-////            System.out.println(i.getName());
-//	    if (messHeadPart.getName().equals("From")) {
-//		System.out.println(messHeadPart.getValue());
-//	    }
-//	    if (messHeadPart.getName().equals("Subject")) {
-//		System.out.println(messHeadPart.getValue());
-//	    }
-//	    if (messHeadPart.getName().equals("References")) {
-//		System.out.println(messHeadPart.getValue());
-//	    }
-//	}
 	return message;
     }
 
@@ -694,6 +680,15 @@ public class MessageProcess {
 	//	    Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, messageId).setFormat("full").execute();
 	List<String> labelIds = message.getLabelIds();
 	if (labelIds.stream().anyMatch((label) -> (label.equals("UNREAD")))) {
+	    return true;
+	}
+	return false;
+    }
+    
+    public static boolean checkImportant(Message message) {
+	//	    Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, messageId).setFormat("full").execute();
+	List<String> labelIds = message.getLabelIds();
+	if (labelIds.stream().anyMatch((label) -> (label.equals("STARRED")))) {
 	    return true;
 	}
 	return false;

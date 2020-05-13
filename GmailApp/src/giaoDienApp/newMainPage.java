@@ -105,7 +105,7 @@ public class newMainPage extends javax.swing.JFrame {
         downMail_Lb = new javax.swing.JLabel();
         moveToTrash_Lb = new javax.swing.JLabel();
         reply_Lb = new javax.swing.JLabel();
-        important_CheckBox = new javax.swing.JCheckBox();
+        starred_CheckBox = new javax.swing.JCheckBox();
         waiting_Pn = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         menu_Pn = new javax.swing.JPanel();
@@ -116,6 +116,7 @@ public class newMainPage extends javax.swing.JFrame {
         logout_Lb = new javax.swing.JLabel();
         daGui_Lb = new javax.swing.JLabel();
         draft_Lb = new javax.swing.JLabel();
+        moreLabel_JCb = new javax.swing.JComboBox<>();
         mail_Pn = new javax.swing.JPanel();
         from_Lb = new javax.swing.JLabel();
         from_Tf = new javax.swing.JTextField();
@@ -263,18 +264,18 @@ public class newMainPage extends javax.swing.JFrame {
         });
         readMail_Pn.add(reply_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 10, 50, 50));
 
-        important_CheckBox.setBackground(new java.awt.Color(34, 92, 145));
-        important_CheckBox.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
-        important_CheckBox.setForeground(new java.awt.Color(247, 231, 231));
-        important_CheckBox.setText("IMPORTANT");
-        important_CheckBox.setToolTipText("");
-        important_CheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        important_CheckBox.addActionListener(new java.awt.event.ActionListener() {
+        starred_CheckBox.setBackground(new java.awt.Color(34, 92, 145));
+        starred_CheckBox.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
+        starred_CheckBox.setForeground(new java.awt.Color(247, 231, 231));
+        starred_CheckBox.setText("STARRED");
+        starred_CheckBox.setToolTipText("");
+        starred_CheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        starred_CheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                important_CheckBoxActionPerformed(evt);
+                starred_CheckBoxActionPerformed(evt);
             }
         });
-        readMail_Pn.add(important_CheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 10, 100, 40));
+        readMail_Pn.add(starred_CheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 10, 100, 40));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/loading.gif"))); // NOI18N
 
@@ -318,7 +319,7 @@ public class newMainPage extends javax.swing.JFrame {
                 boxMail_LbMouseClicked(evt);
             }
         });
-        menu_Pn.add(boxMail_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 330, 70, 70));
+        menu_Pn.add(boxMail_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 290, 70, 70));
 
         trashMail_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         trashMail_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons8_trash_48.png"))); // NOI18N
@@ -329,7 +330,7 @@ public class newMainPage extends javax.swing.JFrame {
                 trashMail_LbMouseClicked(evt);
             }
         });
-        menu_Pn.add(trashMail_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 430, 70, 70));
+        menu_Pn.add(trashMail_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 380, 70, 70));
 
         logout_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         logout_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logout_50px.png"))); // NOI18N
@@ -351,7 +352,7 @@ public class newMainPage extends javax.swing.JFrame {
                 daGui_LbMouseClicked(evt);
             }
         });
-        menu_Pn.add(daGui_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 230, 70, 70));
+        menu_Pn.add(daGui_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 210, 70, 70));
 
         draft_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         draft_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/draft_50px.png"))); // NOI18N
@@ -362,7 +363,19 @@ public class newMainPage extends javax.swing.JFrame {
                 draft_LbMouseClicked(evt);
             }
         });
-        menu_Pn.add(draft_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 530, 70, 60));
+        menu_Pn.add(draft_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 470, 70, 60));
+
+        moreLabel_JCb.setBackground(new java.awt.Color(34, 92, 145));
+        moreLabel_JCb.setEditable(true);
+        moreLabel_JCb.setFont(new java.awt.Font("Consolas", 1, 16)); // NOI18N
+        moreLabel_JCb.setForeground(new java.awt.Color(250, 220, 220));
+        moreLabel_JCb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "More", "IMPORTANT", "SPAM", " " }));
+        moreLabel_JCb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                moreLabel_JCbActionPerformed(evt);
+            }
+        });
+        menu_Pn.add(moreLabel_JCb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 570, 70, 40));
 
         mail_Pn.setBackground(new java.awt.Color(161, 233, 237));
         mail_Pn.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -561,7 +574,7 @@ public class newMainPage extends javax.swing.JFrame {
                     .addComponent(countMailLoading_Lb, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 612, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2))
         );
 
@@ -576,7 +589,7 @@ public class newMainPage extends javax.swing.JFrame {
         );
         dynamic_option_read_writeMenu_PnLayout.setVerticalGroup(
             dynamic_option_read_writeMenu_PnLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 60, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -591,7 +604,7 @@ public class newMainPage extends javax.swing.JFrame {
                         .addComponent(mailBox_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(mail_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(dynamic_option_read_writeMenu_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(dynamic_option_read_writeMenu_Pn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -602,11 +615,8 @@ public class newMainPage extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(mail_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(dynamic_option_read_writeMenu_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(menu_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, 739, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(dynamic_option_read_writeMenu_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addComponent(menu_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -724,7 +734,7 @@ public class newMainPage extends javax.swing.JFrame {
 		    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	    }
-	    chooseMessage = -1;
+
 	}
     }
 
@@ -756,12 +766,23 @@ public class newMainPage extends javax.swing.JFrame {
 		    subject_Tf.setText(msgOb.subject);
 		    date_Tf.setText(msgOb.date);
 		    mainText_Tarea.setText(msgOb.mainText);
-		    // load file len
+		    // kiểm tra cái message này có important không?
+		    try {
+			if (MessageProcess.checkImportant(MessageProcess.getMessageById(GlobalVariable.getService(), GlobalVariable.userId, msgOb.id))) {
+			    this.starred_CheckBox.setSelected(true);
+			} else {
+			    this.starred_CheckBox.setSelected(false);
+			}
+		    } catch (IOException | MessagingException ex) {
+			Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+		    }
+		    // load file của mess lên combobox
 		    DefaultComboBoxModel model = new DefaultComboBoxModel();
 		    for (Map.Entry m : msgOb.listFile.entrySet()) {
 			model.addElement(m.getKey());
 		    }
 		    this.fileAttachRead_Jcb.setModel(model);
+		    // vì đã click vào nên nó sẽ bị set unread là false
 		    msgOb.unread = false;
 		    // set lại label cho mail đã bị đọc và render lại cái jlist 
 		    List<String> labelsToRemove = new ArrayList<>();
@@ -991,7 +1012,7 @@ public class newMainPage extends javax.swing.JFrame {
 		}
 	    }
 	}
-	chooseMessage = -1;
+
     }//GEN-LAST:event_moveToTrash_LbMouseClicked
 
     /**
@@ -1087,7 +1108,6 @@ public class newMainPage extends javax.swing.JFrame {
 	    // set frame được nhìn thấy
 	    a.setVisible(true);
 	}
-	chooseMessage = -1;
     }//GEN-LAST:event_reply_LbMouseClicked
 
     public void loadHopThu(String label) {
@@ -1178,9 +1198,36 @@ public class newMainPage extends javax.swing.JFrame {
 	// TODO add your handling code here:
     }//GEN-LAST:event_boxMail_JlistValueChanged
 
-    private void important_CheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_important_CheckBoxActionPerformed
+    private void starred_CheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_starred_CheckBoxActionPerformed
 	// TODO add your handling code here:
-    }//GEN-LAST:event_important_CheckBoxActionPerformed
+	// gắn thêm label STARRED cho message
+	MessageObject msgOb = this.boxMail_Jlist.getModel().getElementAt(chooseMessage);
+	List<String> labelsToAdd = new ArrayList<>();
+	List<String> labelsToRemove = new ArrayList<>();
+	if (starred_CheckBox.isSelected()) { // nếu chọn
+	    labelsToAdd.add("STARRED");
+	} else {
+	    labelsToRemove.add("STARRED");
+	}
+	try {
+	    MessageProcess.modifyLabelsToMessage(labelsToAdd, labelsToRemove, msgOb.id);
+	    System.out.println("success !");
+
+	} catch (IOException ex) {
+	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	}
+    }//GEN-LAST:event_starred_CheckBoxActionPerformed
+
+    private void moreLabel_JCbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreLabel_JCbActionPerformed
+	// TODO add your handling code here:
+	String label = (String) this.moreLabel_JCb.getSelectedItem();
+	if (!"More".equals(label)) {
+	    if (loadingBoxName_Lb.getText().equals(label)) {
+		return;
+	    }
+	    loadHopThu(label);
+	}
+    }//GEN-LAST:event_moreLabel_JCbActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1241,7 +1288,6 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JLabel fileAttachWrite_Lb;
     private javax.swing.JLabel from_Lb;
     private javax.swing.JTextField from_Tf;
-    private javax.swing.JCheckBox important_CheckBox;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1261,6 +1307,7 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JTextArea mainText_Tarea;
     private javax.swing.JLabel menu_Lb;
     private javax.swing.JPanel menu_Pn;
+    private javax.swing.JComboBox<String> moreLabel_JCb;
     private javax.swing.JLabel moveToTrash_Lb;
     private javax.swing.JLabel newMail_Lb;
     private javax.swing.JPanel readMail_Pn;
@@ -1269,6 +1316,7 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JLabel searchIcon_Lb;
     private javax.swing.JTextField search_Tf;
     private javax.swing.JLabel send_Lb;
+    private javax.swing.JCheckBox starred_CheckBox;
     private javax.swing.JLabel subject_Lb;
     private javax.swing.JTextField subject_Tf;
     private javax.swing.JLabel to_Lb;
@@ -1373,6 +1421,7 @@ public class newMainPage extends javax.swing.JFrame {
     };
 
     /**
+     * Gọi 1 thread load items lên JList
      *
      * @param label
      */
@@ -1384,62 +1433,6 @@ public class newMainPage extends javax.swing.JFrame {
 
 	sw1 = new worker(label);
 	sw1.execute();
-//	List<String> loadFromLabel = new ArrayList<>();
-//	loadFromLabel.add(label);
-//	sw1 = new SwingWorker() {
-//
-//	    @Override
-//	    protected String doInBackground() throws Exception {
-//		ListMessagesResponse response = null;
-//		Gmail service = GlobalVariable.getService();
-//		try {
-//		    response = service.users().messages().list(GlobalVariable.userId).setLabelIds(loadFromLabel).execute();
-//		    List<Message> messages = new ArrayList<>();
-//		    try {
-//			while (response.getMessages() != null && isCancelled() != true) {
-//			    messages.addAll(response.getMessages());
-//			    for (Message msg : messages) {
-//				MessageObject newMessOb = MessageProcess.getQuickHeaderInfo(msg.getId());
-//				System.out.println(msg.getId());
-//				if (isDone()) {
-//				    System.out.println("thread sw1 bị cancel !");
-//				    return null;
-//				}
-//				System.out.println("cái này vẫn chạy nữa");
-//				publish(newMessOb);
-////				Thread.sleep(1000);
-//			    }
-//
-//			    if (response.getNextPageToken() != null) {
-//				String pageToken = response.getNextPageToken();
-//				response = service.users().messages().list(GlobalVariable.userId).setLabelIds(loadFromLabel).setPageToken(pageToken).execute();
-//			    } else {
-//				break;
-//			    }
-//			}
-//		    } catch (IOException ex) {
-//		    }
-//		} catch (IOException ex) {
-//		    Logger.getLogger(loadDataThread.class.getName()).log(Level.SEVERE, null, ex);
-//		}
-//
-//		String res = "Finish loading";
-//		return res;
-//	    }
-//
-//	    @Override
-//	    protected void process(List chunks) {
-//		if (isCancelled()) {
-//		    return;
-//		}
-//		MessageObject val = (MessageObject) chunks.get(chunks.size() - 1);
-//		DefaultListModel model = (DefaultListModel) boxMail_Jlist.getModel();
-//		model.addElement(val);
-//		boxMail_Jlist.setCellRenderer(new mailListRender(label));
-//		boxMail_Jlist.setModel(model);
-//	    }
-//	};
-//	sw1.execute();
     }
 
     private void loadStartUpMailBox() {

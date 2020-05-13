@@ -94,7 +94,7 @@ public class newLogin extends javax.swing.JFrame {
         login_Pn.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 330, 10));
 
         login_Bt.setBackground(new java.awt.Color(161, 233, 237));
-        login_Bt.setFont(new java.awt.Font("Bodoni MT Black", 1, 24)); // NOI18N
+        login_Bt.setFont(new java.awt.Font("Consolas", 1, 24)); // NOI18N
         login_Bt.setText("login");
         login_Bt.setToolTipText("");
         login_Bt.setActionCommand("");
