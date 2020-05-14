@@ -106,8 +106,7 @@ public class newMainPage extends javax.swing.JFrame {
         moveToTrash_Lb = new javax.swing.JLabel();
         reply_Lb = new javax.swing.JLabel();
         starred_CheckBox = new javax.swing.JCheckBox();
-        waiting_Pn = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        forward_Lb = new javax.swing.JLabel();
         menu_Pn = new javax.swing.JPanel();
         menu_Lb = new javax.swing.JLabel();
         newMail_Lb = new javax.swing.JLabel();
@@ -240,7 +239,7 @@ public class newMainPage extends javax.swing.JFrame {
                 downMail_LbMouseClicked(evt);
             }
         });
-        readMail_Pn.add(downMail_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 0, 50, 60));
+        readMail_Pn.add(downMail_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 0, 50, 60));
 
         moveToTrash_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         moveToTrash_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/remove_30px.png"))); // NOI18N
@@ -250,19 +249,21 @@ public class newMainPage extends javax.swing.JFrame {
                 moveToTrash_LbMouseClicked(evt);
             }
         });
-        readMail_Pn.add(moveToTrash_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 0, 50, 60));
+        readMail_Pn.add(moveToTrash_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 0, 50, 60));
 
         reply_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         reply_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/reply_30px.png"))); // NOI18N
+        reply_Lb.setLabelFor(reply_Lb);
         reply_Lb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         reply_Lb.setMaximumSize(new java.awt.Dimension(40, 40));
+        reply_Lb.setName("reply"); // NOI18N
         reply_Lb.setPreferredSize(new java.awt.Dimension(40, 40));
         reply_Lb.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 reply_LbMouseClicked(evt);
             }
         });
-        readMail_Pn.add(reply_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 10, 50, 50));
+        readMail_Pn.add(reply_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 10, 50, 50));
 
         starred_CheckBox.setBackground(new java.awt.Color(34, 92, 145));
         starred_CheckBox.setFont(new java.awt.Font("Consolas", 1, 14)); // NOI18N
@@ -275,20 +276,15 @@ public class newMainPage extends javax.swing.JFrame {
                 starred_CheckBoxActionPerformed(evt);
             }
         });
-        readMail_Pn.add(starred_CheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 10, 100, 40));
+        readMail_Pn.add(starred_CheckBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 10, 100, 40));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/loading.gif"))); // NOI18N
-
-        javax.swing.GroupLayout waiting_PnLayout = new javax.swing.GroupLayout(waiting_Pn);
-        waiting_Pn.setLayout(waiting_PnLayout);
-        waiting_PnLayout.setHorizontalGroup(
-            waiting_PnLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        waiting_PnLayout.setVerticalGroup(
-            waiting_PnLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
+        forward_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/forward_arrow_30px.png"))); // NOI18N
+        forward_Lb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                forward_LbMouseClicked(evt);
+            }
+        });
+        readMail_Pn.add(forward_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 0, 40, 60));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocation(new java.awt.Point(0, 0));
@@ -1235,6 +1231,20 @@ public class newMainPage extends javax.swing.JFrame {
 	}
     }//GEN-LAST:event_moreLabel_JCbActionPerformed
 
+    private void forward_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_forward_LbMouseClicked
+        // TODO add your handling code here:
+	if (chooseMessage != -1) {
+	    // lấy message object tương ứng với index đã chọn
+	    MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
+	    // hiện 1 frame cho thao tác reply
+	    ForwardMailFrame a;
+	    a = new ForwardMailFrame(this, msgOb);
+	    // set frame được nhìn thấy
+	    a.setVisible(true);
+	}
+	
+    }//GEN-LAST:event_forward_LbMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -1292,9 +1302,9 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JLabel fileAttachRead_Lb;
     public javax.swing.JComboBox<String> fileAttachWrite_Jcb;
     private javax.swing.JLabel fileAttachWrite_Lb;
+    private javax.swing.JLabel forward_Lb;
     private javax.swing.JLabel from_Lb;
     private javax.swing.JTextField from_Tf;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
@@ -1329,7 +1339,6 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JTextField to_Tf;
     private javax.swing.JPanel topMenu_Pn;
     private javax.swing.JLabel trashMail_Lb;
-    private javax.swing.JPanel waiting_Pn;
     private javax.swing.JPanel writeMail_Pn;
     // End of variables declaration//GEN-END:variables
 

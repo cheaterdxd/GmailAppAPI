@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
  *
  * @author Admin
  */
-public class ReplyMailFrame extends javax.swing.JFrame {
+public class ForwardMailFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form waitingFrame
@@ -28,10 +28,9 @@ public class ReplyMailFrame extends javax.swing.JFrame {
     MessageObject msgOb;
     String mainText;
     // if click cancel; returnValue = false
-    public ReplyMailFrame(newMainPage parent, MessageObject msgOb) {
+    public ForwardMailFrame(newMainPage parent, MessageObject msgOb) {
 	this.msgOb = msgOb;
 	initComponents();
-	userNameReply_Lb.setText(msgOb.from);
 	replyText_Tarea.setEditable(true);
     }
 
@@ -46,7 +45,6 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        userNameReply_Lb = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         openAddFile_Bt = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
@@ -54,7 +52,8 @@ public class ReplyMailFrame extends javax.swing.JFrame {
         attachFile_Jcb = new javax.swing.JComboBox<>();
         jScrollPane1 = new javax.swing.JScrollPane();
         replyText_Tarea = new javax.swing.JTextArea();
-        sentReply_Bt1 = new javax.swing.JButton();
+        sentForward_Bt = new javax.swing.JButton();
+        forwardTo_Tf = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocation(new java.awt.Point(600, 400));
@@ -69,11 +68,6 @@ public class ReplyMailFrame extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
         jLabel1.setText("Trả lời đến:");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 130, 30));
-
-        userNameReply_Lb.setBackground(new java.awt.Color(161, 233, 237));
-        userNameReply_Lb.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
-        userNameReply_Lb.setToolTipText("các mail cách nhau bởi dấu \";\"");
-        jPanel1.add(userNameReply_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 20, 620, 30));
 
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
         jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 50, 640, 10));
@@ -116,17 +110,23 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 640, 260));
 
-        sentReply_Bt1.setBackground(new java.awt.Color(161, 233, 237));
-        sentReply_Bt1.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
-        sentReply_Bt1.setText("SENT");
-        sentReply_Bt1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        sentReply_Bt1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        sentReply_Bt1.addActionListener(new java.awt.event.ActionListener() {
+        sentForward_Bt.setBackground(new java.awt.Color(161, 233, 237));
+        sentForward_Bt.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
+        sentForward_Bt.setText("SENT");
+        sentForward_Bt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        sentForward_Bt.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        sentForward_Bt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sentReply_Bt1ActionPerformed(evt);
+                sentForward_BtActionPerformed(evt);
             }
         });
-        jPanel1.add(sentReply_Bt1, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 340, 100, 40));
+        jPanel1.add(sentForward_Bt, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 340, 100, 40));
+
+        forwardTo_Tf.setBackground(new java.awt.Color(161, 233, 237));
+        forwardTo_Tf.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
+        forwardTo_Tf.setToolTipText("các mail cách nhau bởi dấu \";\"");
+        forwardTo_Tf.setBorder(null);
+        jPanel1.add(forwardTo_Tf, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 12, 640, 40));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 810, 390));
 
@@ -144,8 +144,11 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 	this.dispose();
     }//GEN-LAST:event_cancel_BtActionPerformed
 
-    private void sentReply_Bt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sentReply_Bt1ActionPerformed
+    private void sentForward_BtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sentForward_BtActionPerformed
         // TODO add your handling code here:
+	// lấy to address
+	String[] listTo;
+	listTo = this.forwardTo_Tf.getText().trim().split(";");
 	// lấy list file
 	List<String> listFileAttach = new ArrayList<>();
 	for(int i=0;i<this.attachFile_Jcb.getItemCount();i++){
@@ -154,15 +157,15 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 	// lấy main text ( nội dung chính) 
 	this.mainText = this.replyText_Tarea.getText();
 	try {
-	    SendMailProcess.reply(msgOb, mainText, listFileAttach);
-	    JOptionPane.showMessageDialog(this, "Bạn đã reply thành công !");
+	    SendMailProcess.forwardMail(msgOb,listTo, mainText,  listFileAttach);
+	    JOptionPane.showMessageDialog(this, "Bạn đã chuyển tiếp thành công !");
 	    this.dispose();
 	} catch (IOException ex) {
-	    JOptionPane.showMessageDialog(this, "Bạn đã reply thất bại!");
-	    Logger.getLogger(ReplyMailFrame.class.getName()).log(Level.SEVERE, null, ex);
+	    JOptionPane.showMessageDialog(this, "Bạn đã chuyển tiếp thất bại!");
+	    Logger.getLogger(ForwardMailFrame.class.getName()).log(Level.SEVERE, null, ex);
 	}
-
-    }//GEN-LAST:event_sentReply_Bt1ActionPerformed
+	
+    }//GEN-LAST:event_sentForward_BtActionPerformed
 
     /**
      * @param args the command line arguments
@@ -181,14 +184,23 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 		}
 	    }
 	} catch (ClassNotFoundException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+	    java.util.logging.Logger.getLogger(ForwardMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 	} catch (InstantiationException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+	    java.util.logging.Logger.getLogger(ForwardMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 	} catch (IllegalAccessException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+	    java.util.logging.Logger.getLogger(ForwardMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 	} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+	    java.util.logging.Logger.getLogger(ForwardMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 	}
+	//</editor-fold>
+	//</editor-fold>
+
+	/* Create and display the form */
+//	java.awt.EventQueue.invokeLater(new Runnable() {
+//	    public void run() {
+//		new ReplyMailFrame().setVisible(true);
+//	    }
+//	});
 	//</editor-fold>
 	//</editor-fold>
 
@@ -203,6 +215,7 @@ public class ReplyMailFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> attachFile_Jcb;
     private javax.swing.JButton cancel_Bt;
+    private javax.swing.JTextField forwardTo_Tf;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
@@ -210,7 +223,6 @@ public class ReplyMailFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton openAddFile_Bt;
     private javax.swing.JTextArea replyText_Tarea;
-    private javax.swing.JButton sentReply_Bt1;
-    private javax.swing.JLabel userNameReply_Lb;
+    private javax.swing.JButton sentForward_Bt;
     // End of variables declaration//GEN-END:variables
 }

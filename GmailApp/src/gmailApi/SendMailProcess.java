@@ -268,7 +268,6 @@ public class SendMailProcess {
 	}
 	com.google.api.services.gmail.model.Message message;
 
-	
 	try {
 	    message = createMessageWithEmail(this.msg);
 	    draft.setMessage(message);
@@ -284,18 +283,18 @@ public class SendMailProcess {
     /**
      * reply a message
      *
-     * @param messageId
+     * @param msgOb
+     * @param listFilePath
      * @param replyMessage
      * @throws IOException
      */
     public static void reply(MessageObject msgOb, String replyMessage, List<String> listFilePath) throws IOException {
 	// must get from old mail
-	String from = null;
+	String from;
 	String subject;
-	String newSubject = "";
-	String oldReferences = null;
-
-	String messageID = null;
+	String newSubject = "Re: ";
+	String oldReferences;
+	String messageID;
 
 	Gmail service = GlobalVariable.getService();
 	String userId = GlobalVariable.userId;
@@ -316,10 +315,62 @@ public class SendMailProcess {
 	    mimeMessage.setText(replyMessage);
 	    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, listto);
 	    mimeMessage.setFrom(new InternetAddress(userId));
-	    mimeMessage.setSubject(newSubject, "utf-8");
+	    mimeMessage.setSubject(newSubject + subject, "utf-8");
 	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
 	    mimeMessage.setHeader("In-Reply-To", messageID);
 
+	    SendMailProcess.sendMessage(service, userId, mimeMessage);
+	} catch (AddressException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	} catch (MessagingException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	}
+    }
+
+    public static void forwardMail(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException {
+	// must get from old mail
+	String from;
+	String subject;
+	String newSubject = "";
+	String oldReferences;
+	String messageID;
+	String standardMessage;
+	Gmail service = GlobalVariable.getService();
+	String userId = GlobalVariable.userId;
+	// lấy thông tin của mail cũ
+	from = msgOb.from;
+	subject = msgOb.subject;
+	oldReferences = msgOb.references;
+	if(oldReferences==null) oldReferences="";
+	messageID = msgOb.messageID;
+	// tạo mail mới
+	Properties props = new Properties();
+	Session session = Session.getDefaultInstance(props, null);
+
+	MimeMessage mimeMessage = new MimeMessage(session);
+
+	InternetAddress[] listto = new InternetAddress[listTo.length];
+	for (int i = 0; i < listTo.length; i++) {
+	    try {
+		listto[i] = new InternetAddress(listTo[i]);
+	    } catch (AddressException ex) {
+		Logger.getLogger(SendMailProcess.class.getName()).log(Level.SEVERE, null, ex);
+	    }
+	}
+	
+	standardMessage = "------------Forwarded message-------------\n"
+			+ "From: "+ msgOb.from+"\n"
+			+ "Date: " + msgOb.date+"\n"
+			+ "Subject: "+ msgOb.subject+ "\n"
+			+ "To: "+ listTo.toString()+"\n";
+	
+	try {
+	    mimeMessage.setRecipients(Message.RecipientType.TO, listto);
+	    mimeMessage.setText(standardMessage+ forwardMessage);
+	    mimeMessage.setFrom(new InternetAddress(userId));
+	    mimeMessage.setSubject(newSubject+subject, "utf-8");
+	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
+	    mimeMessage.setHeader("In-Reply-To", messageID);
 	    SendMailProcess.sendMessage(service, userId, mimeMessage);
 	} catch (AddressException ex) {
 	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);

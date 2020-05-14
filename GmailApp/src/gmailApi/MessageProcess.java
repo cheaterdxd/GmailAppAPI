@@ -139,30 +139,6 @@ public class MessageProcess {
     public static void loadHeaderForMessageOb(MessageObject msgOb, Message message) {
 	MessagePart payload = message.getPayload();
 	List<MessagePartHeader> headers = payload.getHeaders();
-//	for (MessagePartHeader messHeadPart : headers) {
-//	    if (messHeadPart.getName().equals("From")) {
-//		msgOb.from = messHeadPart.getValue();
-//	    }
-//	    if (messHeadPart.getName().equals("Subject")) {
-//		msgOb.subject = messHeadPart.getValue();
-//	    }
-//	    if (messHeadPart.getName().equals("Date")) {
-//		msgOb.date = messHeadPart.getValue();
-//	    }
-//	    if (messHeadPart.getName().equals("To")) {
-//		msgOb.to = messHeadPart.getValue();
-//	    }
-//	    if (messHeadPart.getName().equals("Cc")) {
-//		msgOb.cc = messHeadPart.getValue();
-//	    }
-//	    // lấy 2 trường sử dụng cho việc reply mail
-//	    if (messHeadPart.getName().equals("Message-ID")) {
-//		msgOb.messageID = messHeadPart.getValue();
-//	    }
-//	    if (messHeadPart.getName().equals("References")) {
-//		msgOb.references = messHeadPart.getValue();
-//	    }
-//	}
 	Map<String, String> myMap = new HashMap<>();
 	for (Object i : headers.toArray()) {
 	    String data = i.toString().replace("\\\"", "");
@@ -676,6 +652,11 @@ public class MessageProcess {
 	return msgOb;
     }
 
+    /**
+     * kiểm tra cái mail này đã được đọc chưa
+     * @param message
+     * @return true if unread, false if read
+     */
     public static boolean checkUnread(Message message) {
 	//	    Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, messageId).setFormat("full").execute();
 	List<String> labelIds = message.getLabelIds();
@@ -685,6 +666,11 @@ public class MessageProcess {
 	return false;
     }
     
+    /**
+     * kiểm tra cái mail này có nhãn quan trọng hay khôgn
+     * @param message
+     * @return true if starred, false if no starred
+     */
     public static boolean checkImportant(Message message) {
 	//	    Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, messageId).setFormat("full").execute();
 	List<String> labelIds = message.getLabelIds();
