@@ -672,7 +672,7 @@ public class newMainPage extends javax.swing.JFrame {
     }
 
     private void newMail_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newMail_LbMouseClicked
-	// TODO add your handling code here:
+	// gọi tạo mail mới
 	newMailPrepare();
     }//GEN-LAST:event_newMail_LbMouseClicked
 
@@ -754,11 +754,15 @@ public class newMainPage extends javax.swing.JFrame {
 		send_Lb.setText("Send draft");
 		// xử lý send draft tiếp theo sẽ được xử lý ở event của nút send
 	    } else {
-		System.out.println("chooseIndex:" + chooseMessage);
+		System.out.println("chooseIndex:" + chooseMessage); //test
 		if (chooseMessage != -1) {
+		    // hiện panel đọc mail
 		    mail_Pn.setVisible(true);
+		    // lấy cái object mail được chọn từ cái JList
 		    MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
+		    // load dữ liệu ( header, body)
 		    MessageProcess.loadMessage(msgOb);
+		    // gán dữ liệu lên giao diện
 		    from_Tf.setText(msgOb.from);
 		    to_Tf.setText(msgOb.to);
 		    cc_Tf.setText(msgOb.cc);
@@ -781,13 +785,16 @@ public class newMainPage extends javax.swing.JFrame {
 			model.addElement(m.getKey());
 		    }
 		    this.fileAttachRead_Jcb.setModel(model);
+		    
 		    // vì đã click vào nên nó sẽ bị set unread là false
 		    msgOb.unread = false;
 		    // set lại label cho mail đã bị đọc và render lại cái jlist 
 		    List<String> labelsToRemove = new ArrayList<>();
 		    labelsToRemove.add("UNREAD");
 		    try {
+			// set unread cho message rồi
 			MessageProcess.modifyLabelsToMessage(new ArrayList<String>(), labelsToRemove, msgOb.id);
+			//render lại cái Jlist 
 			DefaultListModel modelJlist = (DefaultListModel) boxMail_Jlist.getModel();
 			boxMail_Jlist.setCellRenderer(new mailListRender(loadingBoxName_Lb.getText()));
 			boxMail_Jlist.setModel(modelJlist);
@@ -957,7 +964,7 @@ public class newMainPage extends javax.swing.JFrame {
 		}
 		// set Model cho Jlist
 		boxMail_Jlist.setModel(searchMailModel);
-		boxMail_Jlist.setCellRenderer(new mailListRender("SERCH"));
+		boxMail_Jlist.setCellRenderer(new mailListRender("SEARCH"));
 		// nếu thành công thì clean đi readMailPanel
 		cleanReadMailPanel();
 	    } catch (IOException | MessagingException ex) {
@@ -1083,6 +1090,7 @@ public class newMainPage extends javax.swing.JFrame {
     private void reload_BtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reload_BtActionPerformed
 	int count = 0;
 	reloadBoxMail(count);
+	// đếm thôi
 	if (loadingBoxName_Lb.getText().equals("INBOX")) {
 	    countInboxLabel = count;
 	}
@@ -1217,7 +1225,6 @@ public class newMainPage extends javax.swing.JFrame {
 	try {
 	    MessageProcess.modifyLabelsToMessage(labelsToAdd, labelsToRemove, msgOb.id);
 	    System.out.println("success !");
-
 	} catch (IOException ex) {
 	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
 	}
@@ -1394,6 +1401,7 @@ public class newMainPage extends javax.swing.JFrame {
 		    while (response.getMessages() != null && isCancelled() != true) {
 			messages.addAll(response.getMessages());
 			for (Message msg : messages) {
+			    // lấy headers của từng mail thôgn qua ID của mail
 			    MessageObject newMessOb = MessageProcess.getQuickHeaderInfo(msg.getId());
 //			    System.out.println(newMessOb.id + " " + newMessOb.from + " " + newMessOb.date);
 			    publish(newMessOb);
@@ -1418,6 +1426,7 @@ public class newMainPage extends javax.swing.JFrame {
 	}
 
 	@Override
+	// xử lý object được publish
 	protected void process(List<MessageObject> chunks) {
 	    if (isCancelled()) {
 		return;
@@ -1429,7 +1438,8 @@ public class newMainPage extends javax.swing.JFrame {
 	    boxMail_Jlist.setModel(model);
 	}
 
-	@Override
+	@Override 
+	// phương thức gọi sau khi thực thi xong
 	protected void done() {
 	    // this method is called when the background
 	    // thread finishes execution

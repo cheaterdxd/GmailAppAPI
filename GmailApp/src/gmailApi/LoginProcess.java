@@ -91,7 +91,7 @@ public class LoginProcess {
 		    .setApplicationName(APPLICATION_NAME)
 		    .build();
 
-	    // kiểm tra xác thực
+	    // kiểm tra xác thực mail nhập vào với mail xác thực có đúng không
 	    service.users().getProfile(GlobalVariable.userId).execute();
 	    // set service khi đã kiểm tra hoàn thành
 	    GlobalVariable.setService(service);

@@ -244,9 +244,11 @@ public class MessageProcess {
 	    System.out.println("parts: " + parts.isEmpty());
 	    loadHeaderForMessageOb(msgOb, message);
 	    parts = message.getPayload().getParts();
+	    
 	    if (parts != null) {
 		loadBodyForMessageOb(msgOb, parts);
 	    } else {
+		// nếu cái parts không có, tức chỉ có text , chính cái Parts này, chính là cái text
 		String data = message.getPayload().getBody().getData();
 		Base64 base64Url = new Base64(true);
 		byte[] emailBytes = Base64.decodeBase64(data);
@@ -716,7 +718,7 @@ public class MessageProcess {
 	// must get from old mail
 	String from;
 	String subject;
-	String newSubject = "Re: ";
+	String newSubject = "Re: "; //re = reply
 	String oldReferences;
 	String messageID;
 
@@ -871,10 +873,10 @@ public class MessageProcess {
 //	for(Address a :email.getAllRecipients()){
 //	    System.out.println(a);
 //	}
-	Enumeration allHeaderLines = email.getAllHeaderLines();
-	while (allHeaderLines.hasMoreElements()) {
-	    System.out.println(allHeaderLines.nextElement().toString());
-	}
+//	Enumeration allHeaderLines = email.getAllHeaderLines();
+//	while (allHeaderLines.hasMoreElements()) {
+//	    System.out.println(allHeaderLines.nextElement().toString());
+//	}
 //	System.out.println(email.getDescription()); // ko có gì
 //	System.out.println(email.getContentID()); // ko cos gif
 //	System.out.println(email.getFileName());
@@ -888,14 +890,23 @@ public class MessageProcess {
 	    }
 	}
 //	email.setRecipients(javax.mail.Message.RecipientType.TO, listto);
+	//remove header To cũ
 	email.removeHeader("To");
+	email.removeHeader("Cc");
+	email.removeHeader("Bcc");
+	// set cái header To mới
 	email.setHeader("To", listTo[0]);
+	String standardMessage = "------------Forwarded message-------------\n"
+		+ "From: " + msgOb.from + "\n"
+		+ "Date: " + msgOb.date + "\n"
+		+ "Subject: " + msgOb.subject + "\n"
+		+ "To: " + msgOb.to + "\n";
 //	Object content = email.getContent();
 //	System.out.println(content.toString());
-	Enumeration allHeaderLines2 = email.getAllHeaderLines();
-	while (allHeaderLines2.hasMoreElements()) {
-	    System.out.println(allHeaderLines2.nextElement().toString());
-	}
+//	Enumeration allHeaderLines2 = email.getAllHeaderLines();
+//	while (allHeaderLines2.hasMoreElements()) {
+//	    System.out.println(allHeaderLines2.nextElement().toString());
+//	}
 	SendMailProcess.sendMessage(GlobalVariable.getService(), GlobalVariable.userId, email);
     }
 

@@ -211,10 +211,15 @@ public class newLogin extends javax.swing.JFrame {
 	    } finally {
 		if (GlobalVariable.internetOn) {
 		    try {
+			// gọi hàm login() 
 			LoginProcess.login();
+			//thành công thì tắt giao diện login
 			this.setVisible(false);
+			// mở main panel
 			newMainPage mainPage = new newMainPage(this);
+			// set userlogin
 			newMainPage.loginingUser_Lb.setText(GlobalVariable.userId);
+			// 
 			mainPage.setVisible(true);
 		    } catch (WrongLoginInfoException ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage());

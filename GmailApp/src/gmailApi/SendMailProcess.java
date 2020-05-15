@@ -118,10 +118,6 @@ public class SendMailProcess {
 	    msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
 	    msg.addHeader("format", "flowed");
 	    msg.addHeader("Content-Transfer-Encoding", "8bit");
-	    // Set mail from who
-	    //msg.setFrom(new InternetAddress(GetMailGmail.fromMail));
-	    // set reply to
-	    //msg.setReplyTo(InternetAddress.parse(GetMailGmail.fromMail,false));
 
 	    // set cc
 	    if (cc != null) {
@@ -220,6 +216,7 @@ public class SendMailProcess {
 	    String userId,
 	    MimeMessage emailContent)
 	    throws MessagingException, IOException {
+	//mimeMessage -> message (gmail api)
 	com.google.api.services.gmail.model.Message message = createMessageWithEmail(emailContent);
 	service.users().messages().send(userId, message).execute();
 //	chỉ dành cho khi test chức năng
