@@ -194,6 +194,7 @@ public class newMainPage extends javax.swing.JFrame {
         cancel_Lb.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         cancel_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/cancel_30px.png"))); // NOI18N
         cancel_Lb.setText(" Cancel");
+        cancel_Lb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         cancel_Lb.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 cancel_LbMouseClicked(evt);
@@ -206,6 +207,7 @@ public class newMainPage extends javax.swing.JFrame {
         send_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/sent_30px.png"))); // NOI18N
         send_Lb.setText(" Send");
         send_Lb.setToolTipText("");
+        send_Lb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         send_Lb.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 send_LbMouseClicked(evt);
@@ -288,6 +290,7 @@ public class newMainPage extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocation(new java.awt.Point(0, 0));
+        setUndecorated(true);
 
         menu_Pn.setBackground(new java.awt.Color(34, 92, 145));
         menu_Pn.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());

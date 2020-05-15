@@ -7,6 +7,7 @@ package gmailApi;
 
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.Label;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
@@ -14,7 +15,10 @@ import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.MessagePartHeader;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
+import com.google.common.io.BaseEncoding;
 import customException.FailToLoadInitInboxException;
+import static gmailApi.SendMailProcess.createMessageWithEmail;
+import static gmailApi.SendMailProcess.sendMessage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -39,19 +43,27 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  *
@@ -95,6 +107,16 @@ public class MessageProcess {
 //	    getMessageById(service, userId, message.getId());
 //	}
 	return messages;
+    }
+
+    public Map<String, String> headerMessageParser(List<MessagePartHeader> headers) {
+	Map<String, String> myMap = new HashMap<>();
+	for (Object i : headers.toArray()) {
+	    String data = i.toString().replace("\\\"", "");
+	    String[] parts = data.split("\"");
+	    myMap.put(parts[3], parts[7]);
+	}
+	return myMap;
     }
 
     /**
@@ -654,6 +676,7 @@ public class MessageProcess {
 
     /**
      * kiểm tra cái mail này đã được đọc chưa
+     *
      * @param message
      * @return true if unread, false if read
      */
@@ -665,9 +688,10 @@ public class MessageProcess {
 	}
 	return false;
     }
-    
+
     /**
      * kiểm tra cái mail này có nhãn quan trọng hay khôgn
+     *
      * @param message
      * @return true if starred, false if no starred
      */
@@ -678,6 +702,201 @@ public class MessageProcess {
 	    return true;
 	}
 	return false;
+    }
+
+    /**
+     * reply a message
+     *
+     * @param msgOb
+     * @param listFilePath
+     * @param replyMessage
+     * @throws IOException
+     */
+    public static void reply(MessageObject msgOb, String replyMessage, List<String> listFilePath) throws IOException {
+	// must get from old mail
+	String from;
+	String subject;
+	String newSubject = "Re: ";
+	String oldReferences;
+	String messageID;
+
+	Gmail service = GlobalVariable.getService();
+	String userId = GlobalVariable.userId;
+	// lấy thông tin của mail cũ
+	from = msgOb.from;
+	subject = msgOb.subject;
+	oldReferences = msgOb.references;
+	messageID = msgOb.messageID;
+	// tạo mail mới
+	Properties props = new Properties();
+	Session session = Session.getDefaultInstance(props, null);
+
+	MimeMessage mimeMessage = new MimeMessage(session);
+	InternetAddress[] listto = new InternetAddress[1];
+	InternetAddress[] listfrom = new InternetAddress[1];
+	try {
+	    listto[0] = new InternetAddress(from);
+	    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, listto);
+	    mimeMessage.setFrom(new InternetAddress(userId));
+	    mimeMessage.setSubject(newSubject + subject, "utf-8");
+	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
+	    mimeMessage.setHeader("In-Reply-To", messageID);
+	    if (listFilePath == null || listFilePath.isEmpty()) {
+		mimeMessage.setText(replyMessage);
+	    } else {
+//		SendMailProcess.prepareMailAttachment(mimeMessage, listFilePath, replyMessage);
+		// create the multi message for attachment
+		Multipart multiPart = new MimeMultipart();
+		try {
+
+		    // create the body part 
+		    BodyPart msgBodyPart;
+		    msgBodyPart = new MimeBodyPart();
+
+		    // add the body message
+		    msgBodyPart.setText(replyMessage);
+
+		    // add the first multi part (text)  
+		    multiPart.addBodyPart(msgBodyPart);
+
+		    // add the second part (attachment)
+		    for (int i = 0; i < listFilePath.size(); i++) {
+//		addAttachment(multiPart, listFilePath.get(i));
+			try {
+			    BodyPart attachBodyPart = new MimeBodyPart();
+			    DataSource source = new FileDataSource(listFilePath.get(i));
+			    DataHandler dh = new DataHandler(source);
+			    attachBodyPart.setDataHandler(dh);
+			    attachBodyPart.setFileName(listFilePath.get(i));
+			    multiPart.addBodyPart(attachBodyPart);
+			} catch (MessagingException e) {
+			    System.out.println(e.toString());
+			    System.out.println("Failed to add file: " + listFilePath.get(i));
+			}
+		    }
+
+		    // set msg full part(text + attachment) 
+		    mimeMessage.setContent(multiPart);
+		} catch (MessagingException e) {
+		    System.out.println(e.toString());
+		    System.out.println("There're something wrong with prepare mail with attachment !");
+		    multiPart = null;
+		}
+	    }
+	    SendMailProcess.sendMessage(service, userId, mimeMessage);
+	} catch (AddressException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	} catch (MessagingException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	}
+    }
+
+    public static void forwardMail(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException {
+	// must get from old mail
+	String from;
+	String subject;
+	String newSubject = "";
+	String oldReferences;
+	String messageID;
+	String standardMessage;
+	Gmail service = GlobalVariable.getService();
+	String userId = GlobalVariable.userId;
+	// lấy thông tin của mail cũ
+	from = msgOb.from;
+	subject = msgOb.subject;
+	oldReferences = msgOb.references;
+	if (oldReferences == null) {
+	    oldReferences = "";
+	}
+	messageID = msgOb.messageID;
+	// tạo mail mới
+	Properties props = new Properties();
+	Session session = Session.getDefaultInstance(props, null);
+
+	MimeMessage mimeMessage = new MimeMessage(session);
+
+	InternetAddress[] listto = new InternetAddress[listTo.length];
+	for (int i = 0; i < listTo.length; i++) {
+	    try {
+		listto[i] = new InternetAddress(listTo[i]);
+	    } catch (AddressException ex) {
+		Logger.getLogger(SendMailProcess.class.getName()).log(Level.SEVERE, null, ex);
+	    }
+	}
+	String to = "";
+	for (String listTo1 : listTo) {
+	    to += listTo1;
+	    to += ";";
+	}
+
+	standardMessage = "------------Forwarded message-------------\n"
+		+ "From: " + msgOb.from + "\n"
+		+ "Date: " + msgOb.date + "\n"
+		+ "Subject: " + msgOb.subject + "\n"
+		+ "To: " + to + "\n";
+
+	try {
+	    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, listto);
+	    mimeMessage.setFrom(new InternetAddress(userId));
+	    mimeMessage.setSubject(newSubject + subject, "utf-8");
+	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
+	    mimeMessage.setHeader("In-Reply-To", messageID);
+	    if (listFilePath == null || listFilePath.isEmpty()) {
+		mimeMessage.setText(standardMessage + forwardMessage);
+	    } else {
+//		SendMailProcess.prepareMailAttachment(mimeMessage, listFilePath, standardMessage + forwardMessage);
+	    }
+//	    SendMailProcess.sendMessage(service, userId, mimeMessage);
+	    Message message = createMessageWithEmail(mimeMessage);
+
+	    service.users().messages().send(userId, message).execute();
+
+	} catch (AddressException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	} catch (MessagingException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	}
+    }
+
+    public static void forward2(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException, MessagingException {
+	Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, msgOb.id).setFormat("raw").execute();
+
+	Base64 base64Url = new Base64(true);
+	byte[] emailBytes = base64Url.decodeBase64(message.getRaw());
+
+	Properties props = new Properties();
+	Session session = Session.getDefaultInstance(props, null);
+
+	MimeMessage email = new MimeMessage(session, new ByteArrayInputStream(emailBytes));
+//	for(Address a :email.getAllRecipients()){
+//	    System.out.println(a);
+//	}
+	Enumeration allHeaderLines = email.getAllHeaderLines();
+	while (allHeaderLines.hasMoreElements()) {
+	    System.out.println(allHeaderLines.nextElement().toString());
+	}
+//	System.out.println(email.getDescription()); // ko có gì
+//	System.out.println(email.getContentID()); // ko cos gif
+//	System.out.println(email.getFileName());
+//	System.out.println(email.getHeader("From")[0]);
+	InternetAddress[] listto = new InternetAddress[listTo.length];
+	for (int i = 0; i < listTo.length; i++) {
+	    try {
+		listto[i] = new InternetAddress(listTo[i]);
+	    } catch (AddressException ex) {
+		Logger.getLogger(SendMailProcess.class.getName()).log(Level.SEVERE, null, ex);
+	    }
+	}
+//	email.setRecipients(javax.mail.Message.RecipientType.TO, listto);
+	email.removeHeader("To");
+	email.setHeader("To", listTo[0]);
+//	Object content = email.getContent();
+//	System.out.println(content.toString());
+	Enumeration allHeaderLines2 = email.getAllHeaderLines();
+	while (allHeaderLines2.hasMoreElements()) {
+	    System.out.println(allHeaderLines2.nextElement().toString());
+	}
+	SendMailProcess.sendMessage(GlobalVariable.getService(), GlobalVariable.userId, email);
     }
 
 }

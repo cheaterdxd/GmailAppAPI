@@ -6,9 +6,8 @@
 package giaoDienApp;
 
 import gmailApi.MessageObject;
-import gmailApi.SendMailProcess;
+import gmailApi.MessageProcess;
 import gmailApi.XuLyFile;
-import java.awt.Frame;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,7 +153,7 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 	// lấy main text ( nội dung chính) 
 	this.mainText = this.replyText_Tarea.getText();
 	try {
-	    SendMailProcess.reply(msgOb, mainText, listFileAttach);
+	    MessageProcess.reply(msgOb, mainText, listFileAttach);
 	    JOptionPane.showMessageDialog(this, "Bạn đã reply thành công !");
 	    this.dispose();
 	} catch (IOException ex) {
@@ -180,15 +179,18 @@ public class ReplyMailFrame extends javax.swing.JFrame {
 		    break;
 		}
 	    }
-	} catch (ClassNotFoundException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	} catch (InstantiationException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	} catch (IllegalAccessException ex) {
-	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-	} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+	} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
 	    java.util.logging.Logger.getLogger(ReplyMailFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
 	}
+	//</editor-fold>
+	//</editor-fold>
+	/* Create and display the form */
+//	java.awt.EventQueue.invokeLater(new Runnable() {
+//	    public void run() {
+//		new ReplyMailFrame().setVisible(true);
+//	    }
+//	});
+	
 	//</editor-fold>
 	//</editor-fold>
 

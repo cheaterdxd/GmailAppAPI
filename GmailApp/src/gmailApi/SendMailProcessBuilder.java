@@ -52,6 +52,6 @@ public class SendMailProcessBuilder {
     }
     
     public SendMailProcess getSendMailProcess(){
-	return new SendMailProcess(toMail, cc, bcc, subject, body);
+	return new SendMailProcess(toMail, cc, bcc, subject, body,fileName);
     }
 }

@@ -56,6 +56,8 @@ public class SendMailProcess {
     String[] bcc;
     String subject;
     String body;
+//    String in_reply_to;
+//    String reference;
     List<String> fileName;
     MimeMessage msg;
 
@@ -75,6 +77,16 @@ public class SendMailProcess {
 	this.body = body;
 	this.fileName = fileName;
     }
+//    public SendMailProcess(String[] toMail, String[] cc, String[] bcc, String subject, String body, List<String> fileName, String in_reply_to, String reference) {
+//	this.toMail = toMail;
+//	this.cc = cc;
+//	this.bcc = bcc;
+//	this.subject = subject;
+//	this.body = body;
+//	this.fileName = fileName;
+//	this.reference = reference;
+//	this.in_reply_to = in_reply_to;
+//    }
 
     /**
      * Create a message from an email.
@@ -84,7 +96,7 @@ public class SendMailProcess {
      * @throws IOException
      * @throws MessagingException
      */
-    private static com.google.api.services.gmail.model.Message createMessageWithEmail(MimeMessage emailContent)
+    public static com.google.api.services.gmail.model.Message createMessageWithEmail(MimeMessage emailContent)
 	    throws MessagingException, IOException {
 	ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 	emailContent.writeTo(buffer);
@@ -100,7 +112,7 @@ public class SendMailProcess {
 	Properties props = new Properties();
 	Session session = Session.getDefaultInstance(props, null);
 
-	this.msg = new MimeMessage(session);
+	msg = new MimeMessage(session);
 	try {
 	    // set mail header
 	    msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
@@ -150,7 +162,7 @@ public class SendMailProcess {
     }
 
     // thêm file attachment
-    private void addAttachment(Multipart multiPart, String file) {
+    private static void addAttachment(Multipart multiPart, String file) {
 	try {
 	    BodyPart attachBodyPart = new MimeBodyPart();
 	    DataSource source = new FileDataSource(file);
@@ -165,13 +177,14 @@ public class SendMailProcess {
     }
 
     // thêm vào message phần attachment
-    private void prepareMailAttachment() {
+    private void prepareMailAttachment(List<String> fileName, String body) {
 	// create the multi message for attachment
 	Multipart multiPart = new MimeMultipart();
 	try {
 
 	    // create the body part 
-	    BodyPart msgBodyPart = new MimeBodyPart();
+	    BodyPart msgBodyPart;
+	    msgBodyPart = new MimeBodyPart();
 
 	    // add the body message
 	    msgBodyPart.setText(body);
@@ -228,11 +241,12 @@ public class SendMailProcess {
 	    prepareTextMail();
 	} else {
 	    prepareTextMail();
-	    prepareMailAttachment();
+	    prepareMailAttachment(fileName,body);
 	}
 	sendMessage(service, userId, msg);
     }
-
+    
+        
     /**
      * taọ mail như là 1 thư nháp, được tìm thấy trong hộp thư nháp
      *
@@ -246,7 +260,7 @@ public class SendMailProcess {
 	    prepareTextMail();
 	} else {
 	    prepareTextMail();
-	    prepareMailAttachment();
+	    prepareMailAttachment(fileName,body);
 	}
 	try {
 	    com.google.api.services.gmail.model.Message message = createMessageWithEmail(this.msg);
@@ -264,7 +278,7 @@ public class SendMailProcess {
 	    prepareTextMail();
 	} else {
 	    prepareTextMail();
-	    prepareMailAttachment();
+	    prepareMailAttachment(fileName,body);
 	}
 	com.google.api.services.gmail.model.Message message;
 
@@ -278,104 +292,5 @@ public class SendMailProcess {
 	}
 	return false;
 
-    }
-
-    /**
-     * reply a message
-     *
-     * @param msgOb
-     * @param listFilePath
-     * @param replyMessage
-     * @throws IOException
-     */
-    public static void reply(MessageObject msgOb, String replyMessage, List<String> listFilePath) throws IOException {
-	// must get from old mail
-	String from;
-	String subject;
-	String newSubject = "Re: ";
-	String oldReferences;
-	String messageID;
-
-	Gmail service = GlobalVariable.getService();
-	String userId = GlobalVariable.userId;
-	// lấy thông tin của mail cũ
-	from = msgOb.from;
-	subject = msgOb.subject;
-	oldReferences = msgOb.references;
-	messageID = msgOb.messageID;
-	// tạo mail mới
-	Properties props = new Properties();
-	Session session = Session.getDefaultInstance(props, null);
-
-	MimeMessage mimeMessage = new MimeMessage(session);
-	InternetAddress[] listto = new InternetAddress[1];
-	InternetAddress[] listfrom = new InternetAddress[1];
-	try {
-	    listto[0] = new InternetAddress(from);
-	    mimeMessage.setText(replyMessage);
-	    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, listto);
-	    mimeMessage.setFrom(new InternetAddress(userId));
-	    mimeMessage.setSubject(newSubject + subject, "utf-8");
-	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
-	    mimeMessage.setHeader("In-Reply-To", messageID);
-
-	    SendMailProcess.sendMessage(service, userId, mimeMessage);
-	} catch (AddressException ex) {
-	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
-	} catch (MessagingException ex) {
-	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
-	}
-    }
-
-    public static void forwardMail(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException {
-	// must get from old mail
-	String from;
-	String subject;
-	String newSubject = "";
-	String oldReferences;
-	String messageID;
-	String standardMessage;
-	Gmail service = GlobalVariable.getService();
-	String userId = GlobalVariable.userId;
-	// lấy thông tin của mail cũ
-	from = msgOb.from;
-	subject = msgOb.subject;
-	oldReferences = msgOb.references;
-	if(oldReferences==null) oldReferences="";
-	messageID = msgOb.messageID;
-	// tạo mail mới
-	Properties props = new Properties();
-	Session session = Session.getDefaultInstance(props, null);
-
-	MimeMessage mimeMessage = new MimeMessage(session);
-
-	InternetAddress[] listto = new InternetAddress[listTo.length];
-	for (int i = 0; i < listTo.length; i++) {
-	    try {
-		listto[i] = new InternetAddress(listTo[i]);
-	    } catch (AddressException ex) {
-		Logger.getLogger(SendMailProcess.class.getName()).log(Level.SEVERE, null, ex);
-	    }
-	}
-	
-	standardMessage = "------------Forwarded message-------------\n"
-			+ "From: "+ msgOb.from+"\n"
-			+ "Date: " + msgOb.date+"\n"
-			+ "Subject: "+ msgOb.subject+ "\n"
-			+ "To: "+ listTo.toString()+"\n";
-	
-	try {
-	    mimeMessage.setRecipients(Message.RecipientType.TO, listto);
-	    mimeMessage.setText(standardMessage+ forwardMessage);
-	    mimeMessage.setFrom(new InternetAddress(userId));
-	    mimeMessage.setSubject(newSubject+subject, "utf-8");
-	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
-	    mimeMessage.setHeader("In-Reply-To", messageID);
-	    SendMailProcess.sendMessage(service, userId, mimeMessage);
-	} catch (AddressException ex) {
-	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
-	} catch (MessagingException ex) {
-	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
-	}
     }
 }

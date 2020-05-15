@@ -162,18 +162,18 @@ public class GmailQuickstart {
 //	}
 //	MessageProcess.reply("1718c276288b984e", "day la mail thu 3");
 //	System.out.println(XuLyFile.listAllFileInDirectory(GlobalVariable.rootDirectorySaveTokens));
-	try {
-	    Message messageById = MessageProcess.getMessageById(service, user, "171748240b8f6f6f");
-	    System.out.println(messageById.getLabelIds());
-	    MessagePart payload = messageById.getPayload();
-	    List<MessagePartHeader> headers = payload.getHeaders();
-	    MessagePartBody body1 = payload.getBody();
-//	    ObjectMapper objMapper = new ObjectMapper();
-	    Map<String, String> myMap = new HashMap<>();
-	    for (Object i : headers.toArray()) {
-		String data = i.toString().replace("\\\"", "");
-//		System.out.println(i);
-		String[] parts = data.split("\"");
+//	try {
+//	    Message messageById = MessageProcess.getMessageById(service, user, "171748240b8f6f6f");
+//	    System.out.println(messageById.getLabelIds());
+//	    MessagePart payload = messageById.getPayload();
+//	    List<MessagePartHeader> headers = payload.getHeaders();
+//	    MessagePartBody body1 = payload.getBody();
+////	    ObjectMapper objMapper = new ObjectMapper();
+//	    Map<String, String> myMap = new HashMap<>();
+//	    for (Object i : headers.toArray()) {
+//		String data = i.toString().replace("\\\"", "");
+////		System.out.println(i);
+//		String[] parts = data.split("\"");
 //		for(String m : parts){
 //		    System.out.println(m);
 //		}
@@ -183,13 +183,13 @@ public class GmailQuickstart {
 //		
 //		String value = data.split(":")[2];
 //		System.out.println("Phan tu value: "+value);
-		myMap.put(parts[3], parts[7]);
-	    }
-	    System.out.println(myMap.get("From"));
-	    System.out.println(myMap.get("To"));
-	    System.out.println(myMap.get("Subject"));
-	    System.out.println(myMap.get("Date"));
-	    System.out.println(payload.getBody());
+//		myMap.put(parts[3], parts[7]);
+//	    }
+//	    System.out.println(myMap.get("From"));
+//	    System.out.println(myMap.get("To"));
+//	    System.out.println(myMap.get("Subject"));
+//	    System.out.println(myMap.get("Date"));
+//	    System.out.println(payload.getBody());
 //	    for (Map.Entry m : myMap.entrySet()) {
 //		System.out.println(m.getKey() + " " + m.getValue());
 //	    }
@@ -202,14 +202,24 @@ public class GmailQuickstart {
 //	    myMap = objMapper.readValue(jsonData,HashMap.class);
 //	    System.out.println(myMap);
 //	    System.out.println(payload.getHeaders());
+//	} catch (MessagingException ex) {
+//	    Logger.getLogger(GmailQuickstart.class.getName()).log(Level.SEVERE, null, ex);
+//	}
+//	List<String> labelAdd = new ArrayList<>();
+//	labelAdd.add("TRASH");
+//	List<String> labelremove = new ArrayList<>();
+//	labelAdd.add("TRASH");
+//	MessageProcess.modifyLabelsToMessage(labelAdd, labelremove, "171748240b8f6f6f");
+    MessageObject msgOb = new MessageObject();
+    msgOb.id = "171748240b8f6f6f";
+    String[] listo = {"n17dcat061@student.ptithcm.edu.vn"};
+//    MessageProcess.loadMessage(msgOb);
+    List<String> listfile = null;
+	try {
+	    MessageProcess.forward2(msgOb, listo,body, listfile);
 	} catch (MessagingException ex) {
 	    Logger.getLogger(GmailQuickstart.class.getName()).log(Level.SEVERE, null, ex);
 	}
-	List<String> labelAdd = new ArrayList<>();
-	labelAdd.add("TRASH");
-	List<String> labelremove = new ArrayList<>();
-//	labelAdd.add("TRASH");
-	MessageProcess.modifyLabelsToMessage(labelAdd, labelremove, "171748240b8f6f6f");
 	
     }
 }
