@@ -485,7 +485,13 @@ public class newMainPage extends javax.swing.JFrame {
         topMenu_Pn.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         searchIcon_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/search_32px.png"))); // NOI18N
-        topMenu_Pn.add(searchIcon_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, -1, -1));
+        searchIcon_Lb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        searchIcon_Lb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                searchIcon_LbMouseClicked(evt);
+            }
+        });
+        topMenu_Pn.add(searchIcon_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 10, -1, -1));
 
         search_Tf.setBorder(null);
         search_Tf.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -493,10 +499,10 @@ public class newMainPage extends javax.swing.JFrame {
                 search_TfKeyPressed(evt);
             }
         });
-        topMenu_Pn.add(search_Tf, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, 210, 30));
+        topMenu_Pn.add(search_Tf, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 210, 30));
 
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
-        topMenu_Pn.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 40, 210, 10));
+        topMenu_Pn.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 210, 10));
 
         loginingUser_Lb.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
         loginingUser_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/icons8_user_24px.png"))); // NOI18N
@@ -564,7 +570,7 @@ public class newMainPage extends javax.swing.JFrame {
             .addGroup(mailBox_PnLayout.createSequentialGroup()
                 .addGap(1, 1, 1)
                 .addComponent(jScrollPane1))
-            .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jSeparator8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         mailBox_PnLayout.setVerticalGroup(
             mailBox_PnLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -573,9 +579,10 @@ public class newMainPage extends javax.swing.JFrame {
                     .addComponent(loadingBoxName_Lb, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(reload_Bt, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(countMailLoading_Lb, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 4, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1)
                 .addGap(2, 2, 2))
         );
 
@@ -614,10 +621,10 @@ public class newMainPage extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(mailBox_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(mail_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(mail_Pn, javax.swing.GroupLayout.PREFERRED_SIZE, 620, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(dynamic_option_read_writeMenu_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-            .addComponent(menu_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(menu_Pn, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
         );
 
         pack();
@@ -787,7 +794,7 @@ public class newMainPage extends javax.swing.JFrame {
 			model.addElement(m.getKey());
 		    }
 		    this.fileAttachRead_Jcb.setModel(model);
-		    
+
 		    // vì đã click vào nên nó sẽ bị set unread là false
 		    msgOb.unread = false;
 		    // set lại label cho mail đã bị đọc và render lại cái jlist 
@@ -888,7 +895,7 @@ public class newMainPage extends javax.swing.JFrame {
 	} else {
 	    String mailto = to_Tf.getText().trim();
 	    String[] listmailto = mailto.split(";");
-	    for(String mail: listmailto){
+	    for (String mail : listmailto) {
 		checkMail = checkMail(mail);
 	    }
 	    // nếu có thì kiểm tra format có đúng không
@@ -949,30 +956,7 @@ public class newMainPage extends javax.swing.JFrame {
     }//GEN-LAST:event_downMail_LbMouseClicked
 
     private void search_TfKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_search_TfKeyPressed
-	// Nhập xong query và ấn enter để tìm kiếm
-	if (evt.getKeyCode() == KeyEvent.VK_ENTER) { // nhận diện sự kiện ấn Enter
-	    // set label cho Jlist hiển thị là search result
-	    this.loadingBoxName_Lb.setText("Search result");
-	    // lấy về query người dùng nhập
-	    String searchQuery = this.search_Tf.getText();
-	    try {
-		List<MessageObject> searchlist = MessageProcess.search(searchQuery);
-		// khởi tạo Listmodel mới để đổ dữ liệu vào
-		// mà không dùng listmodel cũ , vì có thể vô tình xoá đi mất inboxModel hoặc trashModel
-		DefaultListModel searchMailModel = new DefaultListModel();
-		// load kết quả tìm được vào Model
-		for (int i = 0; i < searchlist.size(); i++) {
-		    searchMailModel.add(i, searchlist.get(i));
-		}
-		// set Model cho Jlist
-		boxMail_Jlist.setModel(searchMailModel);
-		boxMail_Jlist.setCellRenderer(new mailListRender("SEARCH"));
-		// nếu thành công thì clean đi readMailPanel
-		cleanReadMailPanel();
-	    } catch (IOException | MessagingException ex) {
-		Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
-	    }
-	}
+
     }//GEN-LAST:event_search_TfKeyPressed
 
     private void fileAttachWrite_JcbKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fileAttachWrite_JcbKeyPressed
@@ -1248,7 +1232,7 @@ public class newMainPage extends javax.swing.JFrame {
     }//GEN-LAST:event_moreLabel_JCbActionPerformed
 
     private void forward_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_forward_LbMouseClicked
-        // TODO add your handling code here:
+	// TODO add your handling code here:
 	if (chooseMessage != -1) {
 	    // lấy message object tương ứng với index đã chọn
 	    MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseMessage);
@@ -1258,8 +1242,41 @@ public class newMainPage extends javax.swing.JFrame {
 	    // set frame được nhìn thấy
 	    a.setVisible(true);
 	}
-	
+
     }//GEN-LAST:event_forward_LbMouseClicked
+
+    private void searchIcon_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchIcon_LbMouseClicked
+	// TODO add your handling code here:
+	// dừng worker hiện tại (nếu đang chạy) 
+	if (sw1 != null && (sw1.isCancelled() == false || sw1.isDone() == false)) {
+	    sw1.cancel(true);
+	    sw1 = null;
+	}
+	// set label cho Jlist hiển thị là search result
+	this.loadingBoxName_Lb.setText("Search result");
+	this.countMailLoading_Lb.setText("");
+	// lấy về query người dùng nhập
+	String searchQuery = this.search_Tf.getText();
+	try {
+	    List<MessageObject> searchlist = MessageProcess.search(searchQuery);
+	    System.out.println(searchlist.size());
+	    // khởi tạo Listmodel mới để đổ dữ liệu vào
+	    // mà không dùng listmodel cũ , vì có thể vô tình xoá đi mất inboxModel hoặc trashModel
+	    DefaultListModel searchMailModel = new DefaultListModel();
+	    // load kết quả tìm được vào Model
+	    for (int i = 0; i < searchlist.size(); i++) {
+		searchMailModel.add(i, searchlist.get(i));
+	    }
+	    // set Model cho Jlist
+	    boxMail_Jlist.setModel(searchMailModel);
+	    boxMail_Jlist.setCellRenderer(new mailListRender("SEARCH"));
+	    // nếu thành công thì clean đi readMailPanel
+	    cleanReadMailPanel();
+	} catch (IOException | MessagingException ex) {
+	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	}
+
+    }//GEN-LAST:event_searchIcon_LbMouseClicked
 
     /**
      * @param args the command line arguments
@@ -1446,7 +1463,7 @@ public class newMainPage extends javax.swing.JFrame {
 	    boxMail_Jlist.setModel(model);
 	}
 
-	@Override 
+	@Override
 	// phương thức gọi sau khi thực thi xong
 	protected void done() {
 	    // this method is called when the background

@@ -592,22 +592,11 @@ public class MessageProcess {
 	    }
 	}
 	List<MessageObject> listMessages = new ArrayList<>();
-	try {
-	    for (Message msg : messages) {
-		MessageObject newMessOb = new MessageObject();
-		newMessOb.id = msg.getId();
-		newMessOb.from = MessageProcess.getFrom(MessageProcess.getMessageById(GlobalVariable.getService(), GlobalVariable.userId, newMessOb.id).getPayload().getHeaders());
-		listMessages.add(newMessOb); //MessageProcess.parseHeaderMail(msg.getId())
-	    }
-	} catch (IOException | MessagingException ex) {
-//	    Logger.getLogger(Init.class.getName()).log(Level.SEVERE, null, ex);
-	}
+	for (Message msg : messages) {
+	    MessageObject newMessOb = MessageProcess.getQuickHeaderInfo(msg.getId());
+	    listMessages.add(newMessOb); //MessageProcess.parseHeaderMail(msg.getId())
+	}//	    Logger.getLogger(Init.class.getName()).log(Level.SEVERE, null, ex);
 	return listMessages;
-
-//	for (Message message : messages) {
-//	    getMessageById(service, userId, message.getId());
-//	    System.out.println("----------------------------------------------------------");
-//	}
     }
 
     /**
