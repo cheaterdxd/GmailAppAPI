@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package giaoDienApp;
+package trashCode;
 
 import customException.FailToLoadInitInboxException;
+import giaoDienApp.mailListRender;
+import giaoDienApp.newLogin;
 import gmailApi.GlobalVariable;
 import gmailApi.Init;
 import gmailApi.LabelProcess;
@@ -707,7 +709,7 @@ public class newMainPageSmall extends javax.swing.JFrame {
 	}
 	int chon = this.boxMail_Jlist.getSelectedIndex();
 	MessageObject msgOb = messageInbox.get(chon);
-	MessageProcess.saveMail(msgOb, pathDir);
+	MessageProcess.downloadMail(msgOb, pathDir);
 	JOptionPane.showMessageDialog(this, "Bạn đã download thành công!");
     }//GEN-LAST:event_downMail_LbMouseClicked
 

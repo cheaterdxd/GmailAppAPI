@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package giaoDienApp;
+package trashCode;
 
 import gmailApi.Init;
 import gmailApi.MessageObject;
@@ -968,7 +968,7 @@ public class index extends javax.swing.JFrame {
 	String pathDir = XuLyFile.showOpenDirDialog();
 	int chon = list_mailbox.getSelectedIndex();
 	MessageObject msgOb = messageInbox.get(chon);
-	MessageProcess.saveMail(msgOb, pathDir);
+	MessageProcess.downloadMail(msgOb, pathDir);
     }//GEN-LAST:event_read_mail_downloadMouseClicked
 
     private void read_mail_downloadMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_read_mail_downloadMouseEntered

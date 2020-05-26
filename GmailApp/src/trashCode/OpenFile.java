@@ -1,4 +1,4 @@
-package gmailApi;
+package trashCode;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;

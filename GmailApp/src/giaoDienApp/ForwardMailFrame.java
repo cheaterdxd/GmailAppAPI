@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.mail.MessagingException;
 import javax.swing.JOptionPane;
 
 /**
@@ -156,11 +157,13 @@ public class ForwardMailFrame extends javax.swing.JFrame {
 	// lấy main text ( nội dung chính) 
 	this.mainText = this.replyText_Tarea.getText();
 	try {
-	    MessageProcess.forwardMail(msgOb,listTo, mainText,  listFileAttach);
+	    MessageProcess.forward2(msgOb,listTo, mainText,  listFileAttach);
 	    JOptionPane.showMessageDialog(this, "Bạn đã chuyển tiếp thành công !");
 	    this.dispose();
 	} catch (IOException ex) {
 	    JOptionPane.showMessageDialog(this, "Bạn đã chuyển tiếp thất bại!");
+	    Logger.getLogger(ForwardMailFrame.class.getName()).log(Level.SEVERE, null, ex);
+	} catch (MessagingException ex) {
 	    Logger.getLogger(ForwardMailFrame.class.getName()).log(Level.SEVERE, null, ex);
 	}
 	

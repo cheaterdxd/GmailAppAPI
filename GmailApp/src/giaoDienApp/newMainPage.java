@@ -5,6 +5,8 @@
  */
 package giaoDienApp;
 
+import trashCode.loadDataThread;
+import trashCode.index;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.ListMessagesResponse;
@@ -941,7 +943,7 @@ public class newMainPage extends javax.swing.JFrame {
 	// lấy object chứa file đó
 	MessageObject msgOb = boxMail_Jlist.getModel().getElementAt(chooseIndex);
 	// download object mail đã chọn
-	MessageProcess.saveMail(msgOb, pathDir);
+	MessageProcess.downloadMail(msgOb, pathDir);
 	// thông báo thành công
 	JOptionPane.showMessageDialog(this, "Bạn đã download thành công!");
     }//GEN-LAST:event_downMail_LbMouseClicked
@@ -1218,8 +1220,12 @@ public class newMainPage extends javax.swing.JFrame {
 	List<String> labelsToAdd = new ArrayList<>();
 	List<String> labelsToRemove = new ArrayList<>();
 	if (starred_CheckBox.isSelected()) { // nếu chọn
+	    // thêm label
 	    labelsToAdd.add("STARRED");
+	    //download về
+	    MessageProcess.autoDownload(msgOb);
 	} else {
+	    //xoá label
 	    labelsToRemove.add("STARRED");
 	}
 	try {
@@ -1401,7 +1407,7 @@ public class newMainPage extends javax.swing.JFrame {
 		    while (response.getMessages() != null && isCancelled() != true) {
 			messages.addAll(response.getMessages());
 			for (Message msg : messages) {
-			    // lấy headers của từng mail thôgn qua ID của mail
+			    // lấy headers của từng mail thông qua ID của mail
 			    MessageObject newMessOb = MessageProcess.getQuickHeaderInfo(msg.getId());
 //			    System.out.println(newMessOb.id + " " + newMessOb.from + " " + newMessOb.date);
 			    publish(newMessOb);
@@ -1432,6 +1438,8 @@ public class newMainPage extends javax.swing.JFrame {
 		return;
 	    }
 	    MessageObject val = chunks.get(chunks.size() - 1);
+	    // kiểm tra quan trọng và download
+	    MessageProcess.autoDownload(val);
 	    DefaultListModel model = (DefaultListModel) boxMail_Jlist.getModel();
 	    model.addElement(val);
 	    boxMail_Jlist.setCellRenderer(new mailListRender(loadFromLabel.get(0)));

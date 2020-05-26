@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package giaoDienApp;
+package trashCode;
 
 import customException.WrongLoginInfoException;
 import gmailApi.CheckInternetConnection;

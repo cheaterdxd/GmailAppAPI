@@ -19,6 +19,7 @@ import com.google.common.io.BaseEncoding;
 import customException.FailToLoadInitInboxException;
 import static gmailApi.SendMailProcess.createMessageWithEmail;
 import static gmailApi.SendMailProcess.sendMessage;
+import static gmailApi.XuLyFile.checkExistFile;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -615,7 +616,7 @@ public class MessageProcess {
      * @param msgOb
      * @param pathDir
      */
-    public static void saveMail(MessageObject msgOb, String pathDir) {
+    public static void downloadMail(MessageObject msgOb, String pathDir) {
 	FileOutputStream fout = null;
 	ObjectOutputStream o = null;
 	try {
@@ -793,73 +794,15 @@ public class MessageProcess {
 	}
     }
 
-    public static void forwardMail(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException {
-	// must get from old mail
-	String from;
-	String subject;
-	String newSubject = "";
-	String oldReferences;
-	String messageID;
-	String standardMessage;
-	Gmail service = GlobalVariable.getService();
-	String userId = GlobalVariable.userId;
-	// lấy thông tin của mail cũ
-	from = msgOb.from;
-	subject = msgOb.subject;
-	oldReferences = msgOb.references;
-	if (oldReferences == null) {
-	    oldReferences = "";
-	}
-	messageID = msgOb.messageID;
-	// tạo mail mới
-	Properties props = new Properties();
-	Session session = Session.getDefaultInstance(props, null);
-
-	MimeMessage mimeMessage = new MimeMessage(session);
-
-	InternetAddress[] listto = new InternetAddress[listTo.length];
-	for (int i = 0; i < listTo.length; i++) {
-	    try {
-		listto[i] = new InternetAddress(listTo[i]);
-	    } catch (AddressException ex) {
-		Logger.getLogger(SendMailProcess.class.getName()).log(Level.SEVERE, null, ex);
-	    }
-	}
-	String to = "";
-	for (String listTo1 : listTo) {
-	    to += listTo1;
-	    to += ";";
-	}
-
-	standardMessage = "------------Forwarded message-------------\n"
-		+ "From: " + msgOb.from + "\n"
-		+ "Date: " + msgOb.date + "\n"
-		+ "Subject: " + msgOb.subject + "\n"
-		+ "To: " + to + "\n";
-
-	try {
-	    mimeMessage.setRecipients(javax.mail.Message.RecipientType.TO, listto);
-	    mimeMessage.setFrom(new InternetAddress(userId));
-	    mimeMessage.setSubject(newSubject + subject, "utf-8");
-	    mimeMessage.setHeader("References", oldReferences + " " + messageID);
-	    mimeMessage.setHeader("In-Reply-To", messageID);
-	    if (listFilePath == null || listFilePath.isEmpty()) {
-		mimeMessage.setText(standardMessage + forwardMessage);
-	    } else {
-//		SendMailProcess.prepareMailAttachment(mimeMessage, listFilePath, standardMessage + forwardMessage);
-	    }
-//	    SendMailProcess.sendMessage(service, userId, mimeMessage);
-	    Message message = createMessageWithEmail(mimeMessage);
-
-	    service.users().messages().send(userId, message).execute();
-
-	} catch (AddressException ex) {
-	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
-	} catch (MessagingException ex) {
-	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
-	}
-    }
-
+    /**
+     * Forward message
+     * @param msgOb
+     * @param listTo
+     * @param forwardMessage
+     * @param listFilePath
+     * @throws IOException
+     * @throws MessagingException
+     */
     public static void forward2(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException, MessagingException {
 	Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, msgOb.id).setFormat("raw").execute();
 
@@ -909,5 +852,18 @@ public class MessageProcess {
 //	}
 	SendMailProcess.sendMessage(GlobalVariable.getService(), GlobalVariable.userId, email);
     }
-
+    
+    public static void autoDownload(MessageObject msgOb){
+	try {
+	    String fileName = msgOb.id+".msgOb";
+	    Message msg = getMessageById(GlobalVariable.getService(), GlobalVariable.userId, msgOb.id);
+	    if(checkImportant(msg) && !checkExistFile(fileName)){
+		downloadMail(msgOb, GlobalVariable.rootDirectorySaveMail);
+		System.out.println("Success download mail !");
+	    }
+	} catch (IOException | MessagingException ex) {
+	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
+	}
+    }
+    
 }

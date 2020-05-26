@@ -5,8 +5,8 @@
  */
 package gmailApi;
 
-import giaoDienApp.index;
-import giaoDienApp.welcome;
+import giaoDienApp.newLogin;
+
 import static gmailApi.LoginProcess.deleteLoginToken;
 import java.io.File;
 
@@ -17,13 +17,13 @@ import java.io.File;
 public class Main {
 
     public static void main(String[] args) {
-	welcome newWelcome;
+	newLogin newLogin;
 
-	newWelcome = new welcome();
-	newWelcome.lookAndFeel();
+	newLogin = new newLogin();
+	newLogin.lookAndFeel();
 	java.awt.EventQueue.invokeLater(new Runnable() {
 	    public void run() {
-		newWelcome.setVisible(true);
+		newLogin.setVisible(true);
 	    }
 	});
 	Runtime.getRuntime().addShutdownHook(new Thread() {

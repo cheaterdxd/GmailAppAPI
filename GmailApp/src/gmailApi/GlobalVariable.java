@@ -28,6 +28,7 @@ public class GlobalVariable {
      * đường dẫn root lưu tokens
      */
     public static String rootDirectorySaveTokens = "src/userInfo/tokens/"; // thư mục gốc để lưu Tokens cho user
+    public static String rootDirectorySaveMail = "src/userInfo/mails/"; // thư mục lưu mail cho user
     private static Gmail service;
     public static Gmail getService(){
         return GlobalVariable.service;

@@ -74,4 +74,8 @@ public class XuLyFile {
         }
 	return "";
     }
+    
+    public static boolean checkExistFile(String fileName){
+	return new File(GlobalVariable.rootDirectorySaveMail,fileName).exists();
+    }
 }
