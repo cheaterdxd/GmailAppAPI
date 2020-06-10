@@ -221,7 +221,7 @@ public class newLogin extends javax.swing.JFrame {
 			//thành công thì tắt giao diện login
 			this.setVisible(false);
 			// mở main panel
-			newMainPage mainPage = new newMainPage(this,true);
+			newMainPage mainPage = new newMainPage(this);
 			// set userlogin
 			newMainPage.loginingUser_Lb.setText(GlobalVariable.userId);
 			// 
@@ -233,7 +233,7 @@ public class newLogin extends javax.swing.JFrame {
 //		    JOptionPane.showMessageDialog(this, "Không thể truy cập mạng, bạn chỉ có thể đăng nhập với những tài khoản đã lưu!");
 		    if (this.savedToken_Jcb.getSelectedItem().toString().equals(GlobalVariable.userId)) {
 			this.setVisible(false);
-			newMainPage mainPage = new newMainPage(this,false);
+			newMainPage mainPage = new newMainPage(this);
 			newMainPage.loginingUser_Lb.setText(GlobalVariable.userId);
 			mainPage.setVisible(true);
 		    }

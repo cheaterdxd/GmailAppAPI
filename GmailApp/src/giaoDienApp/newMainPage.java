@@ -26,6 +26,7 @@ import gmailApi.XuLyFile;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -37,11 +38,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.MessagingException;
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 /**
@@ -64,9 +68,8 @@ public class newMainPage extends javax.swing.JFrame {
     DefaultListModel sentMailMode = null;
     int countSentLabel = 0;
     SwingWorker sw1;
-    boolean internet = true;
 
-    public newMainPage(newLogin parentFrame, boolean internet) {
+    public newMainPage(newLogin parentFrame) {
 	this.parentFrame = parentFrame;
 	initComponents();
 	// set size cho 2 Pn load động
@@ -86,12 +89,21 @@ public class newMainPage extends javax.swing.JFrame {
 	// hiện panelread con, ẩn panelwrite con
 	readMail_Pn.setVisible(true);
 	writeMail_Pn.setVisible(false);
-	if (internet) {
+	if (GlobalVariable.internetOn) {
 	    // load mail khởi đầu chương trình
 	    loadStartUpMailBox();
 	} else {
 	    setUpForInternetOff();
-	    this.internet = internet;
+	}
+	try {
+	    // load tất cả labels đang có
+	    GlobalVariable.labels = LabelProcess.loadAllLabels();
+	    for (String label : GlobalVariable.labels) {
+		JMenuItem a = createNewLabelItem(label);
+		loadOtherLabelBox.add(a);
+	    }
+	} catch (IOException ex) {
+	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
 	}
     }
 
@@ -118,6 +130,12 @@ public class newMainPage extends javax.swing.JFrame {
         reply_Lb = new javax.swing.JLabel();
         starred_CheckBox = new javax.swing.JCheckBox();
         forward_Lb = new javax.swing.JLabel();
+        rightClickLoadBoxJpopMenu = new javax.swing.JPopupMenu();
+        addLabelItem = new javax.swing.JMenuItem();
+        removeLabelItem = new javax.swing.JMenuItem();
+        moreToolsMenu = new javax.swing.JPopupMenu();
+        addLabelTool = new javax.swing.JMenuItem();
+        loadOtherLabelBox = new javax.swing.JMenu();
         menu_Pn = new javax.swing.JPanel();
         menu_Lb = new javax.swing.JLabel();
         newMail_Lb = new javax.swing.JLabel();
@@ -306,16 +324,55 @@ public class newMainPage extends javax.swing.JFrame {
         });
         readMail_Pn.add(forward_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 0, 40, 60));
 
+        rightClickLoadBoxJpopMenu.setBackground(new java.awt.Color(255, 204, 204));
+        rightClickLoadBoxJpopMenu.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+
+        addLabelItem.setBackground(new java.awt.Color(255, 204, 204));
+        addLabelItem.setText("Add labels");
+        rightClickLoadBoxJpopMenu.add(addLabelItem);
+
+        removeLabelItem.setBackground(new java.awt.Color(255, 204, 204));
+        removeLabelItem.setText("Remove labels");
+        rightClickLoadBoxJpopMenu.add(removeLabelItem);
+
+        moreToolsMenu.setBackground(new java.awt.Color(255, 204, 204));
+        moreToolsMenu.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+
+        addLabelTool.setBackground(new java.awt.Color(255, 204, 204));
+        addLabelTool.setText("NEW LABELS");
+        addLabelTool.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addLabelToolActionPerformed(evt);
+            }
+        });
+        moreToolsMenu.add(addLabelTool);
+
+        loadOtherLabelBox.setBackground(new java.awt.Color(255, 204, 204));
+        loadOtherLabelBox.setText("Load mail in label");
+        moreToolsMenu.add(loadOtherLabelBox);
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocation(new java.awt.Point(0, 0));
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         menu_Pn.setBackground(new java.awt.Color(34, 92, 145));
+        menu_Pn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menu_PnMouseClicked(evt);
+            }
+        });
         menu_Pn.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        menu_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         menu_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/menu_30px.png"))); // NOI18N
-        menu_Pn.add(menu_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 13, -1, -1));
+        menu_Lb.setToolTipText("More tools");
+        menu_Lb.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menu_LbMouseClicked(evt);
+            }
+        });
+        menu_Pn.add(menu_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 3, 70, 50));
 
         newMail_Lb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         newMail_Lb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/add_mail_50px.png"))); // NOI18N
@@ -386,6 +443,7 @@ public class newMainPage extends javax.swing.JFrame {
         spamMailLb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         spamMailLb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/spam_can_50px.png"))); // NOI18N
         spamMailLb.setToolTipText("Spam mail");
+        spamMailLb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         spamMailLb.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 spamMailLbMouseClicked(evt);
@@ -396,6 +454,7 @@ public class newMainPage extends javax.swing.JFrame {
         importantMailLb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         importantMailLb.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/important.png"))); // NOI18N
         importantMailLb.setToolTipText("Important mail");
+        importantMailLb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         importantMailLb.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 importantMailLbMouseClicked(evt);
@@ -753,7 +812,7 @@ public class newMainPage extends javax.swing.JFrame {
     public int chooseMessage = -1;
     private void boxMail_JlistMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_boxMail_JlistMouseClicked
 	// TODO add your handling code here: bấm vào để đọc mail
-	if (!this.internet) {
+	if (!GlobalVariable.internetOn) {
 	    cleanReadMailPanel();
 	    MessageObject msgOb = boxMail_Jlist.getSelectedValue();
 	    // gán dữ liệu lên giao diện
@@ -770,7 +829,10 @@ public class newMainPage extends javax.swing.JFrame {
 	    }
 	    return;
 	}
-
+	// test catch the right click
+	if (SwingUtilities.isRightMouseButton(evt)) {
+	    rightClickLoadBoxJpopMenu.show(this, evt.getXOnScreen(), evt.getYOnScreen());
+	}
 	// set lại content của 2 tab
 	this.tabPane.setTitleAt(0, "Full");
 	this.tabPane.setTitleAt(1, "Plaint Only");
@@ -1337,6 +1399,31 @@ public class newMainPage extends javax.swing.JFrame {
 	}
     }//GEN-LAST:event_spamMailLbMouseClicked
 
+    private void menu_LbMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menu_LbMouseClicked
+	// TODO add your handling code here:
+
+    }//GEN-LAST:event_menu_LbMouseClicked
+
+    private void menu_PnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menu_PnMouseClicked
+	// TODO add your handling code here:
+	if(SwingUtilities.isRightMouseButton(evt)) moreToolsMenu.show(this, evt.getXOnScreen(), evt.getYOnScreen());
+    }//GEN-LAST:event_menu_PnMouseClicked
+
+    private void addLabelToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLabelToolActionPerformed
+	// thêm label tự chọn vào
+	String newLabel = JOptionPane.showInputDialog("Nhập tên label mới").toUpperCase();
+	try {
+	    LabelProcess.addLabel(newLabel);
+	    GlobalVariable.labels.add(newLabel);
+	    JMenuItem newLabelItem = createNewLabelItem(newLabel);
+	    this.loadOtherLabelBox.add(newLabelItem);
+	    JOptionPane.showMessageDialog(this, "Khởi tạo thành công Label mới!");
+	} catch (IOException ex) {
+	    JOptionPane.showMessageDialog(this, "Khởi tạo không thành công Label mới!");
+	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	}
+    }//GEN-LAST:event_addLabelToolActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1375,6 +1462,8 @@ public class newMainPage extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addFileWrite_Bt;
+    private javax.swing.JMenuItem addLabelItem;
+    private javax.swing.JMenuItem addLabelTool;
     private javax.swing.JLabel bcc_Lb;
     private javax.swing.JTextField bcc_Tf;
     public javax.swing.JList<MessageObject> boxMail_Jlist;
@@ -1409,6 +1498,7 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JMenu loadOtherLabelBox;
     private javax.swing.JLabel loadingBoxName_Lb;
     public static javax.swing.JLabel loginingUser_Lb;
     private javax.swing.JLabel logout_Lb;
@@ -1418,11 +1508,14 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JEditorPane mainTextPlain;
     private javax.swing.JLabel menu_Lb;
     private javax.swing.JPanel menu_Pn;
+    private javax.swing.JPopupMenu moreToolsMenu;
     private javax.swing.JLabel moveToTrash_Lb;
     private javax.swing.JLabel newMail_Lb;
     private javax.swing.JPanel readMail_Pn;
     private javax.swing.JButton reload_Bt;
+    private javax.swing.JMenuItem removeLabelItem;
     private javax.swing.JLabel reply_Lb;
+    private javax.swing.JPopupMenu rightClickLoadBoxJpopMenu;
     private javax.swing.JLabel searchIcon_Lb;
     private javax.swing.JTextField search_Tf;
     private javax.swing.JLabel send_Lb;
@@ -1604,5 +1697,16 @@ public class newMainPage extends javax.swing.JFrame {
 	boxMail_Jlist.setCellRenderer(new mailListRender("INBOX"));
 	boxMail_Jlist.setModel(model);
 	System.out.println(listSaveMsgOb.get(0));
+    }
+
+    private JMenuItem createNewLabelItem(String label) {
+	JMenuItem a = new JMenuItem(new AbstractAction() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		loadHopThu(label);
+	    }
+	});
+	a.setText(label);
+	return a;
     }
 }

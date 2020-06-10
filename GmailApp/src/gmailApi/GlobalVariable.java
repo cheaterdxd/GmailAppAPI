@@ -6,6 +6,7 @@
 package gmailApi;
 
 import com.google.api.services.gmail.Gmail;
+import java.util.List;
 
 /**
  *
@@ -41,4 +42,6 @@ public class GlobalVariable {
      * lưu trạng thái internet
      */
     public static boolean internetOn;
+    
+    public static List<String> labels;
 }
