@@ -314,7 +314,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPopupMenu" name="rightClickLoadBoxJpopMenu">
+    <Container class="javax.swing.JPopupMenu" name="rightClickMailPnMenu">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="cc" green="cc" red="ff" type="rgb"/>
@@ -328,26 +328,13 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
       <SubComponents>
-        <MenuItem class="javax.swing.JMenuItem" name="addLabelItem">
+        <Menu class="javax.swing.JMenu" name="editLabelsForMess">
           <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="cc" green="cc" red="ff" type="rgb"/>
-            </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;Add labels&quot;" type="code"/>
+              <Connection code="&quot;CH&#x1ec8;NH S&#x1eec;A LABELS&quot;" type="code"/>
             </Property>
           </Properties>
-        </MenuItem>
-        <MenuItem class="javax.swing.JMenuItem" name="removeLabelItem">
-          <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="cc" green="cc" red="ff" type="rgb"/>
-            </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;Remove labels&quot;" type="code"/>
-            </Property>
-          </Properties>
-        </MenuItem>
+        </Menu>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="moreToolsMenu">
@@ -370,7 +357,7 @@
               <Color blue="cc" green="cc" red="ff" type="rgb"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;NEW LABELS&quot;" type="code"/>
+              <Connection code="&quot;T&#x1ea0;O LABELS M&#x1eda;I&quot;" type="code"/>
             </Property>
           </Properties>
           <Events>
@@ -383,7 +370,7 @@
               <Color blue="cc" green="cc" red="ff" type="rgb"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="&quot;Load mail in label&quot;" type="code"/>
+              <Connection code="&quot;&#x110;&#x1ecc;C MAIL T&#x1eea; LABEL...&quot;" type="code"/>
             </Property>
           </Properties>
         </Menu>
@@ -622,6 +609,9 @@
           <Color blue="ed" green="e9" red="a1" type="rgb"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="mail_PnMouseClicked"/>
+      </Events>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
           <AbsoluteConstraints x="530" y="60" width="870" height="740"/>

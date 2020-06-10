@@ -23,6 +23,7 @@ import gmailApi.MessageProcess;
 import gmailApi.SendMailProcess;
 import gmailApi.SendMailProcessBuilder;
 import gmailApi.XuLyFile;
+import java.awt.CheckboxGroup;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -130,9 +134,8 @@ public class newMainPage extends javax.swing.JFrame {
         reply_Lb = new javax.swing.JLabel();
         starred_CheckBox = new javax.swing.JCheckBox();
         forward_Lb = new javax.swing.JLabel();
-        rightClickLoadBoxJpopMenu = new javax.swing.JPopupMenu();
-        addLabelItem = new javax.swing.JMenuItem();
-        removeLabelItem = new javax.swing.JMenuItem();
+        rightClickMailPnMenu = new javax.swing.JPopupMenu();
+        editLabelsForMess = new javax.swing.JMenu();
         moreToolsMenu = new javax.swing.JPopupMenu();
         addLabelTool = new javax.swing.JMenuItem();
         loadOtherLabelBox = new javax.swing.JMenu();
@@ -324,22 +327,17 @@ public class newMainPage extends javax.swing.JFrame {
         });
         readMail_Pn.add(forward_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 0, 40, 60));
 
-        rightClickLoadBoxJpopMenu.setBackground(new java.awt.Color(255, 204, 204));
-        rightClickLoadBoxJpopMenu.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        rightClickMailPnMenu.setBackground(new java.awt.Color(255, 204, 204));
+        rightClickMailPnMenu.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
 
-        addLabelItem.setBackground(new java.awt.Color(255, 204, 204));
-        addLabelItem.setText("Add labels");
-        rightClickLoadBoxJpopMenu.add(addLabelItem);
-
-        removeLabelItem.setBackground(new java.awt.Color(255, 204, 204));
-        removeLabelItem.setText("Remove labels");
-        rightClickLoadBoxJpopMenu.add(removeLabelItem);
+        editLabelsForMess.setText("CHỈNH SỬA LABELS");
+        rightClickMailPnMenu.add(editLabelsForMess);
 
         moreToolsMenu.setBackground(new java.awt.Color(255, 204, 204));
         moreToolsMenu.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
 
         addLabelTool.setBackground(new java.awt.Color(255, 204, 204));
-        addLabelTool.setText("NEW LABELS");
+        addLabelTool.setText("TẠO LABELS MỚI");
         addLabelTool.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addLabelToolActionPerformed(evt);
@@ -348,7 +346,7 @@ public class newMainPage extends javax.swing.JFrame {
         moreToolsMenu.add(addLabelTool);
 
         loadOtherLabelBox.setBackground(new java.awt.Color(255, 204, 204));
-        loadOtherLabelBox.setText("Load mail in label");
+        loadOtherLabelBox.setText("ĐỌC MAIL TỪ LABEL...");
         moreToolsMenu.add(loadOtherLabelBox);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -465,6 +463,11 @@ public class newMainPage extends javax.swing.JFrame {
         getContentPane().add(menu_Pn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 860));
 
         mail_Pn.setBackground(new java.awt.Color(161, 233, 237));
+        mail_Pn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                mail_PnMouseClicked(evt);
+            }
+        });
         mail_Pn.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         from_Lb.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
@@ -829,10 +832,6 @@ public class newMainPage extends javax.swing.JFrame {
 	    }
 	    return;
 	}
-	// test catch the right click
-	if (SwingUtilities.isRightMouseButton(evt)) {
-	    rightClickLoadBoxJpopMenu.show(this, evt.getXOnScreen(), evt.getYOnScreen());
-	}
 	// set lại content của 2 tab
 	this.tabPane.setTitleAt(0, "Full");
 	this.tabPane.setTitleAt(1, "Plaint Only");
@@ -984,10 +983,10 @@ public class newMainPage extends javax.swing.JFrame {
 	    // thực hiện gửi mail thường
 	    try {
 		newMail.setUpAndSend();
-		JOptionPane.showMessageDialog(this, "Bạn đã gửi mail thành công !");
+		JOptionPane.showMessageDialog(this, "Bạn đã gửi thư thành công!");
 	    } catch (MessagingException | IOException ex) {
 		Logger.getLogger(index.class.getName()).log(Level.SEVERE, null, ex);
-		JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi trong quá trình gửi mail !");
+		JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi trong quá trình gửi mail!");
 	    }
 	}
     }
@@ -996,7 +995,7 @@ public class newMainPage extends javax.swing.JFrame {
 	// kiểm tra địa chỉ mail cần gửi đến có nhập không
 	boolean checkMail = true;
 	if (this.to_Tf.getText().equals("")) {
-	    JOptionPane.showMessageDialog(this, "Bạn chưa nhập mail người cần nhận ! Xin vui lòng nhập đầy đủ !");
+	    JOptionPane.showMessageDialog(this, "Bạn chưa nhập địa chỉ người cần nhận! Xin vui lòng nhập đầy đủ!");
 	} else {
 	    String mailto = to_Tf.getText().trim();
 	    String[] listmailto = mailto.split(";");
@@ -1020,7 +1019,7 @@ public class newMainPage extends javax.swing.JFrame {
 		this.cc_Tf.setToolTipText("");
 		this.to_Tf.setToolTipText("");
 	    } else {
-		JOptionPane.showMessageDialog(this, "Bạn vừa nhập sai format mail của người nhận! Vui lòng kiểm tra kĩ !");
+		JOptionPane.showMessageDialog(this, "Bạn vừa nhập sai định dạng địa chỉ mail của người nhận! Vui lòng kiểm tra kĩ!");
 	    }
 	}
 
@@ -1061,7 +1060,7 @@ public class newMainPage extends javax.swing.JFrame {
 	// download object mail đã chọn
 	MessageProcess.downloadMail(msgOb, pathDir);
 	// thông báo thành công
-	JOptionPane.showMessageDialog(this, "Bạn đã download thành công!");
+	JOptionPane.showMessageDialog(this, "Bạn đã tải thành công!");
     }//GEN-LAST:event_downMail_LbMouseClicked
 
     private void search_TfKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_search_TfKeyPressed
@@ -1163,7 +1162,7 @@ public class newMainPage extends javax.swing.JFrame {
 	if (responseChoose == JOptionPane.YES_OPTION) {
 	    // nếu muốn tạo nháp
 	    clickDraft();
-	    JOptionPane.showMessageDialog(this, "Bạn đã lưu nháp thành công !");
+	    JOptionPane.showMessageDialog(this, "Bạn đã lưu nháp thành công!");
 	    cleanReadMailPanel();
 	} else if (responseChoose == JOptionPane.NO_OPTION) {
 	    // không tạo nháp mà xoá luôn
@@ -1206,7 +1205,7 @@ public class newMainPage extends javax.swing.JFrame {
 	    return;
 	}
 	this.moveToTrash_Lb.setIcon(new ImageIcon("D:\\School\\CNPM\\GmailAppAPI\\GmailApp\\src\\img\\trash_restore_32px.png"));
-	this.moveToTrash_Lb.setToolTipText("Click to untrash");
+	this.moveToTrash_Lb.setToolTipText("Bấm để bỏ trash");
 	loadHopThu("TRASH");
     }//GEN-LAST:event_trashMail_LbMouseClicked
 
@@ -1356,7 +1355,7 @@ public class newMainPage extends javax.swing.JFrame {
 	    sw1 = null;
 	}
 	// set label cho Jlist hiển thị là search result
-	this.loadingBoxName_Lb.setText("Search result");
+	this.loadingBoxName_Lb.setText("Kết quả");
 	this.countMailLoading_Lb.setText("");
 	// lấy về query người dùng nhập
 	String searchQuery = this.search_Tf.getText();
@@ -1406,7 +1405,9 @@ public class newMainPage extends javax.swing.JFrame {
 
     private void menu_PnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menu_PnMouseClicked
 	// TODO add your handling code here:
-	if(SwingUtilities.isRightMouseButton(evt)) moreToolsMenu.show(this, evt.getXOnScreen(), evt.getYOnScreen());
+	if (SwingUtilities.isRightMouseButton(evt)) {
+	    moreToolsMenu.show(this, evt.getXOnScreen(), evt.getYOnScreen());
+	}
     }//GEN-LAST:event_menu_PnMouseClicked
 
     private void addLabelToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLabelToolActionPerformed
@@ -1417,52 +1418,100 @@ public class newMainPage extends javax.swing.JFrame {
 	    GlobalVariable.labels.add(newLabel);
 	    JMenuItem newLabelItem = createNewLabelItem(newLabel);
 	    this.loadOtherLabelBox.add(newLabelItem);
-	    JOptionPane.showMessageDialog(this, "Khởi tạo thành công Label mới!");
+	    JOptionPane.showMessageDialog(this, "Khởi tạo thành công label mới!");
 	} catch (IOException ex) {
-	    JOptionPane.showMessageDialog(this, "Khởi tạo không thành công Label mới!");
+	    JOptionPane.showMessageDialog(this, "Khởi tạo không thành công label mới!");
 	    Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
 	}
     }//GEN-LAST:event_addLabelToolActionPerformed
 
+    private void mail_PnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mail_PnMouseClicked
+	// TODO add your handling code here:
+	// action khi bấm chuột phải của mail đang đọc
+	if (SwingUtilities.isRightMouseButton(evt) && chooseMessage != -1) {
+	    // load labels của mess đang chọn
+	    MessageObject msgOb = this.boxMail_Jlist.getModel().getElementAt(chooseMessage);
+	    Message message;
+	    try {
+		message = MessageProcess.getMessageById(GlobalVariable.getService(), GlobalVariable.userId, msgOb.id);
+		List<String> labelsOfMess = message.getLabelIds();
+		List<Object> dialogContent = new ArrayList<>();
+		dialogContent.add("Tick hoặc bỏ tick để thay đổi labels cho thư");
+		// khởi tạo dialog
+		List<String> groupTypeLabels =Arrays.asList("SPAM","INBOX","TRASH");
+
+		for (String label :GlobalVariable.labels ) {
+		    JCheckBox labelCheckbox = new JCheckBox();
+		    labelCheckbox.setText(label);
+		    if(labelsOfMess.contains(label)) labelCheckbox.setSelected(true);
+		    // bỏ qua nhóm type đặc biệt ở trên
+		    if(groupTypeLabels.contains(label)){
+			continue;
+		    }
+		    dialogContent.add(labelCheckbox);
+		}
+		int confirm = JOptionPane.showConfirmDialog(this, dialogContent.toArray(), "Chỉnh sửa labels cho thư", JOptionPane.OK_CANCEL_OPTION);
+		if(confirm==JOptionPane.OK_OPTION){
+		    dialogContent.remove(0);
+		    List<String> lastLabelsForMess = new ArrayList<>();
+		    dialogContent.stream().filter((jcheck) -> (((JCheckBox)jcheck).isSelected())).forEachOrdered((jcheck) -> {
+			lastLabelsForMess.add(((JCheckBox)jcheck).getText());
+		    });
+		    doUpdateLabel(labelsOfMess,lastLabelsForMess,msgOb.id);
+		    JOptionPane.showMessageDialog(this, "Cập nhật labels của thư thành công!");
+		}
+	    } catch (IOException | MessagingException ex) {
+		JOptionPane.showMessageDialog(this, "Lỗi load hoặc update labels của message. Liên hệ Cheaterdxd để biết thêm chi tiết.");
+		Logger.getLogger(newMainPage.class.getName()).log(Level.SEVERE, null, ex);
+	    }
+
+	}
+    }//GEN-LAST:event_mail_PnMouseClicked
+    
+    private void doUpdateLabel(List<String> oldLabels,List<String> newLabels,String messageId) throws IOException{
+	List<String> temp = oldLabels;
+	oldLabels.removeAll(newLabels); // những labels có ở label cũ mà ko có ở label mới là list removelabel
+	newLabels.removeAll(temp); // những cái ở label mới có mà ở cũ ko có là mấy cái được thêm vào: list addlabel
+	MessageProcess.modifyLabelsToMessage(newLabels, oldLabels, messageId);
+    }
     /**
      * @param args the command line arguments
      */
-//    public static void main(String args[]) {
-//	/* Set the Nimbus look and feel */
-//	//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//	/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-//	 */
-//	try {
-//	    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//		if ("Nimbus".equals(info.getName())) {
-//		    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//		    break;
-//		}
-//	    }
-//	} catch (ClassNotFoundException ex) {
-//	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//	} catch (InstantiationException ex) {
-//	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//	} catch (IllegalAccessException ex) {
-//	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//	} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//	}
-//	//</editor-fold>
-//	//</editor-fold>
-//
-//	/* Create and display the form */
-//	java.awt.EventQueue.invokeLater(new Runnable() {
-//	    public void run() {
-//		new newMainPage().setVisible(true);
-//	    }
-//	});
-//    }
+    //    public static void main(String args[]) {
+    //	/* Set the Nimbus look and feel */
+    //	//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    //	/* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    //         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+    //	 */
+    //	try {
+    //	    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+    //		if ("Nimbus".equals(info.getName())) {
+    //		    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+    //		    break;
+    //		}
+    //	    }
+    //	} catch (ClassNotFoundException ex) {
+    //	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    //	} catch (InstantiationException ex) {
+    //	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    //	} catch (IllegalAccessException ex) {
+    //	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    //	} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+    //	    java.util.logging.Logger.getLogger(newMainPage.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    //	}
+    //	//</editor-fold>
+    //	//</editor-fold>
+    //
+    //	/* Create and display the form */
+    //	java.awt.EventQueue.invokeLater(new Runnable() {
+    //	    public void run() {
+    //		new newMainPage().setVisible(true);
+    //	    }
+    //	});
+    //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addFileWrite_Bt;
-    private javax.swing.JMenuItem addLabelItem;
     private javax.swing.JMenuItem addLabelTool;
     private javax.swing.JLabel bcc_Lb;
     private javax.swing.JTextField bcc_Tf;
@@ -1478,6 +1527,7 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JLabel downMail_Lb;
     private javax.swing.JLabel draft_Lb;
     private javax.swing.JPanel dynamic_option_read_writeMenu_Pn;
+    private javax.swing.JMenu editLabelsForMess;
     private javax.swing.JLabel exit_Lb;
     private javax.swing.JComboBox<String> fileAttachRead_Jcb;
     private javax.swing.JLabel fileAttachRead_Lb;
@@ -1513,9 +1563,8 @@ public class newMainPage extends javax.swing.JFrame {
     private javax.swing.JLabel newMail_Lb;
     private javax.swing.JPanel readMail_Pn;
     private javax.swing.JButton reload_Bt;
-    private javax.swing.JMenuItem removeLabelItem;
     private javax.swing.JLabel reply_Lb;
-    private javax.swing.JPopupMenu rightClickLoadBoxJpopMenu;
+    private javax.swing.JPopupMenu rightClickMailPnMenu;
     private javax.swing.JLabel searchIcon_Lb;
     private javax.swing.JTextField search_Tf;
     private javax.swing.JLabel send_Lb;
@@ -1707,6 +1756,13 @@ public class newMainPage extends javax.swing.JFrame {
 	    }
 	});
 	a.setText(label);
+	return a;
+    }
+
+    private JMenuItem createNewCheckBoxLabelItem(String label, boolean initialState) {
+	JMenuItem a = new JCheckBoxMenuItem();
+	a.setText(label);
+	a.setSelected(initialState);
 	return a;
     }
 }

@@ -27,7 +27,7 @@ public class LabelProcess {
      */
     public static Label addLabel(String labelName) throws IOException {
 	Gmail service = GlobalVariable.getService();
-	Label newLabel = new Label().setName(labelName).setLabelListVisibility("labelShow").setMessageListVisibility("show");
+	Label newLabel = new Label().setName(labelName).setId(labelName).setLabelListVisibility("labelShow").setMessageListVisibility("show");
 	newLabel = service.users().labels().create(GlobalVariable.userId, newLabel).execute();
 	System.out.println("Label id: " + newLabel.getId());
 	System.out.println(newLabel.toPrettyString());
@@ -94,7 +94,7 @@ public class LabelProcess {
 	    listLabel = new ArrayList<>();
 	    System.out.println("Labels:");
 	    for (Label label : labels) {
-		listLabel.add(label.getName());
+		listLabel.add(label.getId());
 	    }
 	}
 	return listLabel;
