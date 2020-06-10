@@ -16,6 +16,7 @@ import com.google.api.services.gmail.model.MessagePartBody;
 import com.google.api.services.gmail.model.MessagePartHeader;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
 import com.google.common.io.BaseEncoding;
+import com.sun.mail.imap.IMAPBodyPart;
 import customException.FailToLoadInitInboxException;
 import static gmailApi.SendMailProcess.createMessageWithEmail;
 import static gmailApi.SendMailProcess.sendMessage;
@@ -186,28 +187,26 @@ public class MessageProcess {
     public static void loadBodyForMessageOb(MessageObject msgOb, List<MessagePart> parts) {
 	for (MessagePart part : parts) {
 	    String mimeType = part.getMimeType();
-	    if (mimeType.equals("multipart/related")) {
+	    if (mimeType.equals("multipart/related") || mimeType.equals("multipart/alternative")) {
 		loadBodyForMessageOb(msgOb, part.getParts());
 	    }
-	    if (mimeType.equals("application/pdf")) {
-		MessagePartBody body = part.getBody();
-		String attId = body.getAttachmentId();
-		String filename = part.getFilename();
-		msgOb.listFile.put(filename, attId);
-	    }
-	    if (mimeType.equals("image/png")) {
-		MessagePartBody body = part.getBody();
-		String attId = body.getAttachmentId();
-		String filename = part.getFilename();
-		msgOb.listFile.put(filename, attId);
-	    }
-	    if (mimeType.equals("audio/mp3")) {
-		MessagePartBody body = part.getBody();
-		String attId = body.getAttachmentId();
-		String filename = part.getFilename();
-		msgOb.listFile.put(filename, attId);
+	    if (mimeType.equals("text/html")) {
+		System.out.println("Yess---------------------------------------------------------------------------------");
+		if (!part.getFilename().isEmpty()) {
+		    MessagePartBody body = part.getBody();
+		    String attId = body.getAttachmentId();
+		    String filename = part.getFilename();
+		    msgOb.listFile.put(filename, attId);
+		} else {
+		    String data = part.getBody().getData();
+		    Base64 base64Url = new Base64(true);
+		    byte[] emailBytes = Base64.decodeBase64(data);
+		    String text = new String(emailBytes);
+		    msgOb.mainTextHtml = text.trim();
+		}
 	    }
 	    if (mimeType.equals("text/plain")) {
+		System.out.println("Yess---------------------------------------------------------------------------------");
 		if (!part.getFilename().isEmpty()) {
 		    MessagePartBody body = part.getBody();
 		    String attId = body.getAttachmentId();
@@ -241,11 +240,11 @@ public class MessageProcess {
 	Message message;
 	try {
 	    message = service.users().messages().get(userId, msgOb.id).setFormat("full").execute();
-	    List<MessagePart> parts = new ArrayList<MessagePart>();
-	    System.out.println("parts: " + parts.isEmpty());
 	    loadHeaderForMessageOb(msgOb, message);
+	    List<MessagePart> parts;
 	    parts = message.getPayload().getParts();
-	    
+//	    System.out.println("parts: " + parts);
+
 	    if (parts != null) {
 		loadBodyForMessageOb(msgOb, parts);
 	    } else {
@@ -562,9 +561,14 @@ public class MessageProcess {
      * @throws IOException
      */
     public static void unTrash(String messageId) throws IOException {
-	Gmail service = GlobalVariable.getService();
-	String userId = GlobalVariable.userId;
-	service.users().messages().untrash(userId, messageId).execute();
+//	Gmail service = GlobalVariable.getService();
+//	String userId = GlobalVariable.userId;
+//	service.users().messages().untrash(userId, messageId).execute();
+	List<String> labelsToAdd = new ArrayList<>();
+	labelsToAdd.add("INBOX");
+	List<String> labelsToRemove = new ArrayList<>();
+	labelsToRemove.add("TRASH");
+	modifyLabelsToMessage(labelsToAdd, labelsToRemove, messageId);
     }
 
     /**
@@ -690,7 +694,7 @@ public class MessageProcess {
     public static boolean checkImportant(Message message) {
 	//	    Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, messageId).setFormat("full").execute();
 	List<String> labelIds = message.getLabelIds();
-	if (labelIds.stream().anyMatch((label) -> (label.equals("STARRED")))) {
+	if (labelIds.stream().anyMatch((label) -> (label.equals("STARRED") || label.equals("IMPORTANT")))) {
 	    return true;
 	}
 	return false;
@@ -785,6 +789,7 @@ public class MessageProcess {
 
     /**
      * Forward message
+     *
      * @param msgOb
      * @param listTo
      * @param forwardMessage
@@ -793,26 +798,17 @@ public class MessageProcess {
      * @throws MessagingException
      */
     public static void forward2(MessageObject msgOb, String[] listTo, String forwardMessage, List<String> listFilePath) throws IOException, MessagingException {
-	Message message = GlobalVariable.getService().users().messages().get(GlobalVariable.userId, msgOb.id).setFormat("raw").execute();
 
-	Base64 base64Url = new Base64(true);
-	byte[] emailBytes = base64Url.decodeBase64(message.getRaw());
-
+	String standardMessage = "------------Forwarded message-------------\n"
+		+ "From: " + msgOb.from + "\n"
+		+ "Date: " + msgOb.date + "\n"
+		+ "Subject: " + msgOb.subject + "\n"
+		+ "To: " + msgOb.to + "\n"
+		+ forwardMessage;
 	Properties props = new Properties();
 	Session session = Session.getDefaultInstance(props, null);
-
-	MimeMessage email = new MimeMessage(session, new ByteArrayInputStream(emailBytes));
-//	for(Address a :email.getAllRecipients()){
-//	    System.out.println(a);
-//	}
-//	Enumeration allHeaderLines = email.getAllHeaderLines();
-//	while (allHeaderLines.hasMoreElements()) {
-//	    System.out.println(allHeaderLines.nextElement().toString());
-//	}
-//	System.out.println(email.getDescription()); // ko có gì
-//	System.out.println(email.getContentID()); // ko cos gif
-//	System.out.println(email.getFileName());
-//	System.out.println(email.getHeader("From")[0]);
+	MimeMessage mime = new MimeMessage(session);
+	mime.setFrom(new InternetAddress(GlobalVariable.userId));
 	InternetAddress[] listto = new InternetAddress[listTo.length];
 	for (int i = 0; i < listTo.length; i++) {
 	    try {
@@ -821,32 +817,49 @@ public class MessageProcess {
 		Logger.getLogger(SendMailProcess.class.getName()).log(Level.SEVERE, null, ex);
 	    }
 	}
-//	email.setRecipients(javax.mail.Message.RecipientType.TO, listto);
-	//remove header To cũ
-	email.removeHeader("To");
-	email.removeHeader("Cc");
-	email.removeHeader("Bcc");
-	// set cái header To mới
-	email.setHeader("To", listTo[0]);
-	String standardMessage = "------------Forwarded message-------------\n"
-		+ "From: " + msgOb.from + "\n"
-		+ "Date: " + msgOb.date + "\n"
-		+ "Subject: " + msgOb.subject + "\n"
-		+ "To: " + msgOb.to + "\n";
-//	Object content = email.getContent();
-//	System.out.println(content.toString());
-//	Enumeration allHeaderLines2 = email.getAllHeaderLines();
-//	while (allHeaderLines2.hasMoreElements()) {
-//	    System.out.println(allHeaderLines2.nextElement().toString());
-//	}
-	SendMailProcess.sendMessage(GlobalVariable.getService(), GlobalVariable.userId, email);
+	mime.setRecipients(javax.mail.Message.RecipientType.TO, listto);
+	
+	//tạo multipart
+	Multipart multipart = new MimeMultipart();
+	//tạo bodypart
+	MimeBodyPart forwardedMess = new MimeBodyPart();
+	// set content
+	forwardedMess.setContent(standardMessage, "text/plain");
+	// add vào multipart
+	multipart.addBodyPart(forwardedMess);
+	// add html content vào bodypart
+	MimeBodyPart forwardedContentHtml = new MimeBodyPart();
+	forwardedContentHtml.setContent(msgOb.mainTextHtml, "text/html");
+	multipart.addBodyPart(forwardedContentHtml);
+	// add plain vào bodypart
+	MimeBodyPart forwardedContentPlain = new MimeBodyPart();
+	forwardedContentPlain.setContent(msgOb.mainText, "text/html");
+	multipart.addBodyPart(forwardedContentPlain);
+	//  add file
+	if (listFilePath != null && listFilePath.size() > 0) {
+            for (String filePath : listFilePath) {
+                MimeBodyPart attachPart = new MimeBodyPart();
+ 
+                try {
+                    attachPart.attachFile(filePath);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+ 
+                multipart.addBodyPart(attachPart);
+            }
+        }
+	
+	mime.setContent(multipart);
+	SendMailProcess.sendMessage(GlobalVariable.getService(), GlobalVariable.userId, mime);
     }
-    
-    public static void autoDownload(MessageObject msgOb){
+
+    public static void autoDownload(MessageObject msgOb) {
 	try {
-	    String fileName = msgOb.id+".msgOb";
+	    String fileName = msgOb.id + ".msgOb";
 	    Message msg = getMessageById(GlobalVariable.getService(), GlobalVariable.userId, msgOb.id);
-	    if(checkImportant(msg) && !checkExistFile(fileName)){
+	    if (checkImportant(msg) && !checkExistFile(fileName)) {
+		loadMessage(msgOb);
 		downloadMail(msgOb, GlobalVariable.rootDirectorySaveMail);
 		System.out.println("Success download mail !");
 	    }
@@ -854,5 +867,5 @@ public class MessageProcess {
 	    Logger.getLogger(MessageProcess.class.getName()).log(Level.SEVERE, null, ex);
 	}
     }
-    
+
 }

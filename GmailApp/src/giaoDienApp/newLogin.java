@@ -73,7 +73,7 @@ public class newLogin extends javax.swing.JFrame {
 
         username_Lb.setFont(new java.awt.Font("Consolas", 1, 18)); // NOI18N
         username_Lb.setText("Username");
-        login_Pn.add(username_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, -1, 40));
+        login_Pn.add(username_Lb, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, -1, 40));
 
         userNameInput_Tf.setBackground(new java.awt.Color(161, 233, 237));
         userNameInput_Tf.setFont(new java.awt.Font("Consolas", 1, 16)); // NOI18N
@@ -88,16 +88,20 @@ public class newLogin extends javax.swing.JFrame {
                 userNameInput_TfActionPerformed(evt);
             }
         });
-        login_Pn.add(userNameInput_Tf, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 310, 50));
+        login_Pn.add(userNameInput_Tf, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 330, 30));
 
+        jSeparator1.setBackground(new java.awt.Color(0, 0, 0));
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
         login_Pn.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, 330, 10));
 
-        login_Bt.setBackground(new java.awt.Color(161, 233, 237));
+        login_Bt.setBackground(new java.awt.Color(255, 255, 255));
         login_Bt.setFont(new java.awt.Font("Consolas", 1, 24)); // NOI18N
+        login_Bt.setForeground(new java.awt.Color(102, 102, 102));
         login_Bt.setText("login");
         login_Bt.setToolTipText("");
         login_Bt.setActionCommand("");
+        login_Bt.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        login_Bt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         login_Bt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 login_BtActionPerformed(evt);
@@ -105,9 +109,10 @@ public class newLogin extends javax.swing.JFrame {
         });
         login_Pn.add(login_Bt, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 450, 170, 60));
 
-        savedToken_Jcb.setBackground(new java.awt.Color(161, 233, 237));
         savedToken_Jcb.setFont(new java.awt.Font("Consolas", 1, 16)); // NOI18N
+        savedToken_Jcb.setForeground(new java.awt.Color(102, 102, 102));
         savedToken_Jcb.setBorder(null);
+        savedToken_Jcb.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         savedToken_Jcb.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 savedToken_JcbMouseClicked(evt);
@@ -216,7 +221,7 @@ public class newLogin extends javax.swing.JFrame {
 			//thành công thì tắt giao diện login
 			this.setVisible(false);
 			// mở main panel
-			newMainPage mainPage = new newMainPage(this);
+			newMainPage mainPage = new newMainPage(this,true);
 			// set userlogin
 			newMainPage.loginingUser_Lb.setText(GlobalVariable.userId);
 			// 
@@ -228,7 +233,7 @@ public class newLogin extends javax.swing.JFrame {
 //		    JOptionPane.showMessageDialog(this, "Không thể truy cập mạng, bạn chỉ có thể đăng nhập với những tài khoản đã lưu!");
 		    if (this.savedToken_Jcb.getSelectedItem().toString().equals(GlobalVariable.userId)) {
 			this.setVisible(false);
-			newMainPage mainPage = new newMainPage(this);
+			newMainPage mainPage = new newMainPage(this,false);
 			newMainPage.loginingUser_Lb.setText(GlobalVariable.userId);
 			mainPage.setVisible(true);
 		    }
@@ -296,7 +301,7 @@ public class newLogin extends javax.swing.JFrame {
 	 */
 	try {
 	    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-		if ("windows".equals(info.getName())) {
+		if ("Nimbus".equals(info.getName())) {
 		    javax.swing.UIManager.setLookAndFeel(info.getClassName());
 		    break;
 		}

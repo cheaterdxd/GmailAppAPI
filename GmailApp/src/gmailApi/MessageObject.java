@@ -27,6 +27,7 @@ public class MessageObject implements Serializable {
     public String time;
     public String avtName;
     public String mainText;
+    public String mainTextHtml;
     public String to;
     public Map<String,String> listFile = new HashMap<>();
     // hai trường đặc biệt sử dụng khi reply mail

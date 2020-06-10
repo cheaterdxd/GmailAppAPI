@@ -108,7 +108,7 @@ public class SendMailProcess {
     }
 
     // chuẩn bị phần mail là dạng text
-    private void prepareTextMail() {
+	private void prepareTextMail() {
 	Properties props = new Properties();
 	Session session = Session.getDefaultInstance(props, null);
 

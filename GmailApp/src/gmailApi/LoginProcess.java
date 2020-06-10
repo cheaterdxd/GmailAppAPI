@@ -66,6 +66,7 @@ public class LoginProcess {
 	GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
 	// Build flow and trigger user authorization request.
+	TOKENS_DIRECTORY_PATH = tokenRootPath + XulyChuoiMail.parseMail(GlobalVariable.userId);
 	GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
 		HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
 		.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
@@ -83,7 +84,7 @@ public class LoginProcess {
      * @throws WrongLoginInfoException
      */
     public static void login() throws WrongLoginInfoException {
-	TOKENS_DIRECTORY_PATH = tokenRootPath + XulyChuoiMail.parseMail(GlobalVariable.userId);
+	
 	try {
 	    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
